@@ -43,13 +43,13 @@ export default function Footer() {
               15+ ஆண்டுகள் அனுபவம் கொண்ட நம்பிக்கையான சுற்றுலா நிறுவனம். உங்கள் கனவு பயணத்தை நாங்கள் நிஜமாக்குகிறோம்.
             </p>
             <div className="flex items-center gap-3">
-              <a href="#" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
+              <a href="https://www.facebook.com/profile.php?id=61570715695145" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
+              <a href="https://www.instagram.com/madhumalathi151/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
+              <a href="https://www.youtube.com/@Srinivasa_tour" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all">
                 <Youtube className="w-4 h-4" />
               </a>
             </div>
