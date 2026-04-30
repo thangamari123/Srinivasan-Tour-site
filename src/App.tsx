@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import FloatingButtons from './components/FloatingButtons';
+import Preloader from './components/Preloader';
 import Home from './pages/Home';
 import About from './pages/About';
 import Packages from './pages/Packages';
@@ -14,6 +15,7 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
+        <Preloader />
         <ScrollToTop />
         <Navbar />
         <main className="flex-1">

@@ -122,3 +122,16 @@ body {
   background-image: radial-gradient(circle, rgba(59, 125, 216, 0.1) 1px, transparent 1px);
   background-size: 24px 24px;
 }
+
+/* Preloader Animations */
+@keyframes progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+@keyframes fly {
+  0% { left: 0%; transform: translateX(-50%) rotate(45deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; transform: translateX(-50%) rotate(45deg); opacity: 0; }
+}
