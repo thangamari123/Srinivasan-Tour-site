@@ -3,18 +3,18 @@ import { useState } from 'react';
 import { X, Download } from 'lucide-react';
 
 const galleryImages = [
-  { src: '/images/gallery1.jpg', title: 'தாஜ்மஹால், ஆக்ரா', category: 'இந்தியா' },
-  { src: '/images/gallery2.jpg', title: 'ஜெய்ப்பூர் அரண்மனை', category: 'இந்தியா' },
-  { src: '/images/gallery3.jpg', title: 'பாலி கோவில், இந்தோனேசியா', category: 'வெளிநாடு' },
-  { src: '/images/gallery4.jpg', title: 'ஸ்விஸ் ஆல்ப்ஸ்', category: 'வெளிநாடு' },
-  { src: '/images/gallery5.jpg', title: 'முன்னார் தேயிலை தோட்டம்', category: 'இந்தியா' },
-  { src: '/images/gallery6.jpg', title: 'இலங்கை கடற்கரை', category: 'வெளிநாடு' },
-  { src: '/images/pilgrimage.jpg', title: 'திருப்பதி கோவில்', category: 'யாத்திரை' },
-  { src: '/images/package2.jpg', title: 'கோவா கடற்கரை', category: 'இந்தியா' },
-  { src: '/images/package3.jpg', title: 'சிங்கப்பூர் மரினா பே', category: 'வெளிநாடு' },
-  { src: '/images/package4.jpg', title: 'மாலத்தீவு தீவுகள்', category: 'வெளிநாடு' },
-  { src: '/images/package5.jpg', title: 'பாங்காக் அரண்மனை', category: 'வெளிநாடு' },
-  { src: '/images/package6.jpg', title: 'ராமேஸ்வரம் கோவில்', category: 'யாத்திரை' },
+  { src: '/images/gallery1.webp', title: 'தாஜ்மஹால், ஆக்ரா', category: 'இந்தியா' },
+  { src: '/images/gallery2.webp', title: 'ஜெய்ப்பூர் அரண்மனை', category: 'இந்தியா' },
+  { src: '/images/gallery3.webp', title: 'பாலி கோவில், இந்தோனேசியா', category: 'வெளிநாடு' },
+  { src: '/images/gallery4.webp', title: 'ஸ்விஸ் ஆல்ப்ஸ்', category: 'வெளிநாடு' },
+  { src: '/images/gallery5.webp', title: 'முன்னார் தேயிலை தோட்டம்', category: 'இந்தியா' },
+  { src: '/images/gallery6.webp', title: 'இலங்கை கடற்கரை', category: 'வெளிநாடு' },
+  { src: '/images/pilgrimage.webp', title: 'திருப்பதி கோவில்', category: 'யாத்திரை' },
+  { src: '/images/package2.webp', title: 'கோவா கடற்கரை', category: 'இந்தியா' },
+  { src: '/images/package3.webp', title: 'சிங்கப்பூர் மரினா பே', category: 'வெளிநாடு' },
+  { src: '/images/package4.webp', title: 'மாலத்தீவு தீவுகள்', category: 'வெளிநாடு' },
+  { src: '/images/package5.webp', title: 'பாங்காக் அரண்மனை', category: 'வெளிநாடு' },
+  { src: '/images/package6.webp', title: 'ராமேஸ்வரம் கோவில்', category: 'யாத்திரை' },
 ];
 
 const categories = ['அனைத்தும்', 'யாத்திரை', 'இந்தியா', 'வெளிநாடு'];
@@ -45,7 +45,7 @@ export default function Gallery() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/gallery1.jpg"
+            src="/images/gallery1.webp"
             alt="Gallery"
             className="w-full h-full object-cover opacity-20"
           />

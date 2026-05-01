@@ -314,7 +314,7 @@ export default function PackageDetail() {
           </motion.div>
 
           {/* Carousel */}
-          <GalleryCarousel images={pkg.images} title={pkg.title} />
+          <GalleryCarousel images={imagesByPackage[pkg.slug] || pkg.images} title={pkg.title} />
         </div>
       </section>
 
@@ -330,17 +330,17 @@ export default function PackageDetail() {
             className="text-center mb-12"
           >
             <span className="inline-block px-4 py-1.5 bg-navy-400/10 text-navy-400 text-sm font-semibold rounded-full font-tamil mb-4">
-              வீடியோக்கள்
+              பயணிகள் கருத்துக்கள்
             </span>
             <h2 className="font-tamil text-2xl sm:text-3xl font-bold text-navy-950 mb-3">
-              பயண வீடியோக்கள்
+              எங்கள் பயணிகள் சொல்வது
             </h2>
             <p className="font-tamil text-navy-600/60 text-base max-w-xl mx-auto">
               எங்கள் பயணிகளின் நிஜமான அனுபவங்களை வீடியோவில் காணுங்கள்
             </p>
           </motion.div>
 
-          <VideoReels category={pkg.category} />
+          <VideoReels category={pkg.category} slug={pkg.slug} />
         </div>
       </section>
 
@@ -560,6 +560,96 @@ const reelsByCategory: Record<string, ReelData[]> = {
   ],
 };
 
+const reelsByPackage: Record<string, ReelData[]> = {
+  'tirupathi-yathirai': [
+    { type: 'youtube', videoId: '9kpF_wuxFVU', title: 'திருப்பதி தரிசனம்', location: 'திருமலை', views: '12K' },
+    { type: 'youtube', videoId: '3y4VTfd_uHc', title: 'பத்மாவதி தாயார் கோவில்', location: 'திருப்பதி', views: '8.5K' },
+    { type: 'youtube', videoId: 'Ux1Emi4nX60', title: 'திருப்பதி மலைப் பாதை', location: 'திருப்பதி', views: '15K' },
+    { type: 'youtube', videoId: 'tRwQTU4Gd4M', title: 'கோவிந்தராஜசுவாமி கோவில்', location: 'திருப்பதி', views: '6.2K' },
+  ],
+  'rameswaram-yathirai': [
+    { type: 'youtube', videoId: 'Zjy2dHyW8qs', title: 'ராமேஸ்வரம் கோவில்', location: 'ராமேஸ்வரம்', views: '14K' },
+    { type: 'youtube', videoId: '6m7nT2x6UGY', title: 'தனுஷ்கோடி பயணம்', location: 'தனுஷ்கோடி', views: '22K' },
+    { type: 'youtube', videoId: '6xUNZQalY1k', title: 'அக்னி தீர்த்தம்', location: 'ராமேஸ்வரம்', views: '18K' },
+    { type: 'youtube', videoId: 'RruC4SuDK80', title: 'பாம்பன் பாலம்', location: 'ராமேஸ்வரம்', views: '25K' },
+  ],
+  'varanasi-yathirai': [
+    { type: 'youtube', videoId: 'Kb_4OuWzqJw', title: 'காசி விஸ்வநாதர் தரிசனம்', location: 'வாரணாசி', views: '30K' },
+    { type: 'youtube', videoId: 'trO4-tYJqyY', title: 'கங்கை ஆரத்தி', location: 'வாரணாசி', views: '45K' },
+    { type: 'youtube', videoId: 'wS2hYPDlQcQ', title: 'கங்கை படகு சவாரி', location: 'வாரணாசி', views: '20K' },
+    { type: 'youtube', videoId: 'gNPyvV4DYvc', title: 'சாரநாத் புத்தர் கோவில்', location: 'வாரணாசி', views: '15K' },
+  ],
+  'srirangam-yathirai': [
+    { type: 'youtube', videoId: '8UfLtHGHXMs', title: 'ஸ்ரீ ரங்கநாதர் தரிசனம்', location: 'ஸ்ரீரங்கம்', views: '18K' },
+    { type: 'youtube', videoId: '2sbgDWCTeMw', title: 'கோபுர தரிசனம்', location: 'ஸ்ரீரங்கம்', views: '12K' },
+    { type: 'youtube', videoId: 'oE_3i_nRxic', title: 'ஜம்புகேஸ்வரர் கோவில்', location: 'திருச்சி', views: '10K' },
+    { type: 'youtube', videoId: 'BIiZjrQtpRg', title: 'உறையூர் கோவில்', location: 'திருச்சி', views: '8K' },
+  ],
+  'kerala-nature-tour': [
+    { type: 'youtube', videoId: 'cyF2doCivIo', title: 'ஆலப்புழா ஹவுஸ்போட்', location: 'ஆலப்புழா', views: '25K' },
+    { type: 'youtube', videoId: 'OaF34GSTtCw', title: 'முன்னார் தேயிலை தோட்டம்', location: 'முன்னார்', views: '32K' },
+    { type: 'youtube', videoId: 'uCleWHSZOWc', title: 'தேக்கடி யானை சவாரி', location: 'தேக்கடி', views: '20K' },
+    { type: 'youtube', videoId: '80N2U1FT_40', title: 'கதகளி நடனம்', location: 'கேரளா', views: '15K' },
+  ],
+  'goa-beach-tour': [
+    { type: 'youtube', videoId: '9kpF_wuxFVU', title: 'பாகா கடற்கரை', location: 'கோவா', views: '40K' },
+    { type: 'youtube', videoId: '3y4VTfd_uHc', title: 'கோவா நீர் விளையாட்டுகள்', location: 'கோவா', views: '35K' },
+    { type: 'youtube', videoId: 'Ux1Emi4nX60', title: 'பழைய கோவா தேவாலயம்', location: 'கோவா', views: '25K' },
+    { type: 'youtube', videoId: 'tRwQTU4Gd4M', title: 'கோவா சூரிய அஸ்தமனம்', location: 'கோவா', views: '30K' },
+  ],
+  'rajasthan-palace-tour': [
+    { type: 'youtube', videoId: 'Zjy2dHyW8qs', title: 'ஜெய்ப்பூர் ஹவா மஹால்', location: 'ஜெய்ப்பூர்', views: '28K' },
+    { type: 'youtube', videoId: '6m7nT2x6UGY', title: 'உதய்ப்பூர் ஏரி அரண்மனை', location: 'உதய்ப்பூர்', views: '35K' },
+    { type: 'youtube', videoId: '6xUNZQalY1k', title: 'பாலைவன சபாரி', location: 'ஜோத்பூர்', views: '22K' },
+    { type: 'youtube', videoId: 'RruC4SuDK80', title: 'மெஹரான்கர் கோட்டை', location: 'ஜோத்பூர்', views: '25K' },
+  ],
+  'himachal-mountain-tour': [
+    { type: 'youtube', videoId: 'Kb_4OuWzqJw', title: 'ஷிம்லா பனிப்பொழிவு', location: 'ஷிம்லா', views: '45K' },
+    { type: 'youtube', videoId: 'trO4-tYJqyY', title: 'மனாலி ரோதங் பாஸ்', location: 'மனாலி', views: '50K' },
+    { type: 'youtube', videoId: 'wS2hYPDlQcQ', title: 'சோலங்கு பள்ளத்தாக்கு', location: 'மனாலி', views: '38K' },
+    { type: 'youtube', videoId: 'gNPyvV4DYvc', title: 'தர்மசாலா பௌத்த கோவில்', location: 'தர்மசாலா', views: '20K' },
+  ],
+  'singapore-malaysia-tour': [
+    { type: 'youtube', videoId: '8UfLtHGHXMs', title: 'மரினா பே சேண்ட்ஸ்', location: 'சிங்கப்பூர்', views: '55K' },
+    { type: 'youtube', videoId: '2sbgDWCTeMw', title: 'யுனிவர்சல் ஸ்டுடியோஸ்', location: 'சிங்கப்பூர்', views: '60K' },
+    { type: 'youtube', videoId: 'oE_3i_nRxic', title: 'கெந்திங் ஹைலேண்ட்ஸ்', location: 'மலேசியா', views: '40K' },
+    { type: 'youtube', videoId: 'BIiZjrQtpRg', title: 'பத்து குகைகள்', location: 'மலேசியா', views: '35K' },
+  ],
+  'dubai-tour': [
+    { type: 'youtube', videoId: 'cyF2doCivIo', title: 'புர்ஜ் கலீபா', location: 'துபாய்', views: '80K' },
+    { type: 'youtube', videoId: 'OaF34GSTtCw', title: 'டெசர்ட் சபாரி', location: 'துபாய்', views: '65K' },
+    { type: 'youtube', videoId: 'uCleWHSZOWc', title: 'துபாய் மால்', location: 'துபாய்', views: '45K' },
+    { type: 'youtube', videoId: '80N2U1FT_40', title: 'துபாய் பவுண்டன் ஷோ', location: 'துபாய்', views: '70K' },
+  ],
+  'maldives-tour': [
+    { type: 'youtube', videoId: '9kpF_wuxFVU', title: 'மாலத்தீவு வாட்டர் வில்லா', location: 'மாலத்தீவு', views: '75K' },
+    { type: 'youtube', videoId: '3y4VTfd_uHc', title: 'ஸ்கூபா டைவிங்', location: 'மாலத்தீவு', views: '50K' },
+    { type: 'youtube', videoId: 'Ux1Emi4nX60', title: 'ஸ்நார்க்கெலிங்', location: 'மாலத்தீவு', views: '40K' },
+    { type: 'youtube', videoId: 'tRwQTU4Gd4M', title: 'சூரிய அஸ்தமன பயணம்', location: 'மாலத்தீவு', views: '60K' },
+  ],
+  'bali-thailand-tour': [
+    { type: 'youtube', videoId: 'Zjy2dHyW8qs', title: 'பாலி உபுத் நெல் வயல்', location: 'பாலி', views: '35K' },
+    { type: 'youtube', videoId: '6m7nT2x6UGY', title: 'தானா லோட் கோவில்', location: 'பாலி', views: '45K' },
+    { type: 'youtube', videoId: '6xUNZQalY1k', title: 'பாங்காக் வாட் அருண்', location: 'தாய்லாந்து', views: '55K' },
+    { type: 'youtube', videoId: 'RruC4SuDK80', title: 'பட்டாயா கோரல் தீவு', location: 'தாய்லாந்து', views: '65K' },
+  ],
+};
+
+const imagesByPackage: Record<string, string[]> = {
+  'tirupathi-yathirai': ['/images/gen_tirupati.webp', '/images/pilgrimage.webp', '/images/package1.webp', '/images/gallery1.webp'],
+  'rameswaram-yathirai': ['/images/gen_rameswaram.webp', '/images/package6.webp', '/images/gallery2.webp', '/images/pilgrimage.webp'],
+  'varanasi-yathirai': ['/images/gen_varanasi.webp', '/images/package1.webp', '/images/gallery3.webp', '/images/hero-bg.webp'],
+  'srirangam-yathirai': ['/images/gen_srirangam.webp', '/images/pilgrimage.webp', '/images/gallery4.webp', '/images/package6.webp'],
+  'kerala-nature-tour': ['/images/gen_kerala.webp', '/images/india-tour.webp', '/images/gallery5.webp', '/images/package2.webp'],
+  'goa-beach-tour': ['/images/gen_goa.webp', '/images/package2.webp', '/images/gallery6.webp', '/images/india-tour.webp'],
+  'rajasthan-palace-tour': ['/images/gen_rajasthan.webp', '/images/gallery2.webp', '/images/gallery1.webp', '/images/package3.webp'],
+  'himachal-mountain-tour': ['/images/gen_himachal.webp', '/images/gallery4.webp', '/images/gallery5.webp', '/images/india-tour.webp'],
+  'singapore-malaysia-tour': ['/images/gen_singapore.webp', '/images/package3.webp', '/images/package5.webp', '/images/international-tour.webp'],
+  'dubai-tour': ['/images/gen_dubai.webp', '/images/international-tour.webp', '/images/package4.webp', '/images/gallery2.webp'],
+  'maldives-tour': ['/images/gen_maldives.webp', '/images/package4.webp', '/images/gallery6.webp', '/images/gallery5.webp'],
+  'bali-thailand-tour': ['/images/gen_bali.webp', '/images/package5.webp', '/images/gallery3.webp', '/images/international-tour.webp'],
+};
+
 function getThumbnail(reel: ReelData): string {
   if (reel.type === 'youtube') {
     return `https://img.youtube.com/vi/${reel.videoId}/hqdefault.jpg`;
@@ -576,8 +666,8 @@ function getEmbedUrl(reel: ReelData): string {
   return `https://drive.google.com/file/d/${reel.videoId}/preview`;
 }
 
-function VideoReels({ category }: { category: string }) {
-  const reels = reelsByCategory[category] || reelsByCategory.pilgrimage;
+function VideoReels({ category, slug }: { category: string, slug?: string }) {
+  const reels = (slug && reelsByPackage[slug]) || reelsByCategory[category] || reelsByCategory.pilgrimage;
   const [activeReel, setActiveReel] = useState<ReelData | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 

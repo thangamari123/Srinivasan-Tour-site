@@ -37,7 +37,7 @@ export default function Preloader() {
         <div className="relative w-28 h-28 sm:w-36 sm:h-36 mb-6 animate-float">
           <div className="absolute inset-0 bg-gold-400/20 rounded-full blur-xl animate-pulse"></div>
           <img
-            src="/images/logo.png"
+            src="/images/logo.webp"
             alt="Srinivasa Tour Operators"
             className="relative w-full h-full object-cover rounded-2xl shadow-2xl shadow-gold-500/20"
           />

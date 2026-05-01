@@ -38,7 +38,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 group">
             <img
-              src="/images/logo.png"
+              src="/images/logo.webp"
               alt="ஸ்ரீநிவாசா Tour Operators"
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl shadow-lg shadow-gold-500/20 group-hover:shadow-gold-500/40 transition-all object-cover"
             />

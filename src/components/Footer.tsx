@@ -30,7 +30,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-5">
               <img
-                src="/images/logo.png"
+                src="/images/logo.webp"
                 alt="ஸ்ரீநிவாசா Tour Operators"
                 className="w-12 h-12 rounded-xl shadow-lg shadow-gold-500/20 object-cover"
               />

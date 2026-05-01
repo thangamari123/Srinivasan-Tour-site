@@ -78,7 +78,7 @@ export default function Contact() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/gallery5.jpg"
+            src="/images/gallery5.webp"
             alt="Contact"
             className="w-full h-full object-cover opacity-20"
           />

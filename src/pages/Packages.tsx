@@ -28,7 +28,7 @@ export default function Packages() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/package3.jpg"
+            src="/images/package3.webp"
             alt="Packages"
             className="w-full h-full object-cover opacity-20"
           />

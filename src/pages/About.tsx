@@ -24,7 +24,7 @@ export default function About() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/india-tour.jpg"
+            src="/images/india-tour.webp"
             alt="About us"
             className="w-full h-full object-cover opacity-20"
           />
@@ -61,7 +61,7 @@ export default function About() {
             >
               <div className="relative">
                 <img
-                  src="/images/pilgrimage.jpg"
+                  src="/images/pilgrimage.webp"
                   alt="Our story"
                   className="w-full h-96 object-cover rounded-3xl shadow-2xl"
                 />

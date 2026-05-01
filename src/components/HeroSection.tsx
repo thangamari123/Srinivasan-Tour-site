@@ -4,10 +4,10 @@ import { Phone, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 const backgroundImages = [
-  '/images/pilgrimage.jpg',
-  '/images/india-tour.jpg',
-  '/images/international-tour.jpg',
-  '/images/hero-bg.jpg'
+  '/images/pilgrimage.webp',
+  '/images/india-tour.webp',
+  '/images/international-tour.webp',
+  '/images/hero-bg.webp'
 ];
 
 export default function HeroSection() {
