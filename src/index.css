@@ -135,3 +135,20 @@ body {
   90% { opacity: 1; }
   100% { left: 100%; transform: translateX(-50%) rotate(45deg); opacity: 0; }
 }
+/* Hide Google Translate Banner and Widget */
+.goog-te-banner-frame, 
+.goog-te-balloon-frame, 
+#goog-gt-tt, 
+.goog-te-balloon-wrapper, 
+.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
