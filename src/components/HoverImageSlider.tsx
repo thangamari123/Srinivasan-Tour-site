@@ -11,7 +11,7 @@ export default function HoverImageSlider({ images, title }: HoverImageSliderProp
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setInterval>;
     if (isHovered && images.length > 1) {
       timer = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
