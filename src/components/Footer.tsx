@@ -96,8 +96,8 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-white/80 text-sm font-medium text-gold-400 mb-1">SRINIVASA TOUR OPERATORS</p>
-                  <p className="text-white/80 text-sm">#19/34, Venkataraman Street,</p>
+                  <p className="text-white/80 text-sm font-medium text-gold-400 mb-1">Head Office</p>
+                  <p className="text-white/80 text-sm">19/34, Venkataraman Street,</p>
                   <p className="text-white/80 text-sm">Perambur, Chennai - 600 011.</p>
                   <p className="text-white/60 text-xs mt-0.5">(Opp. Railway Station & Bus Stand)</p>
                 </div>
@@ -105,6 +105,7 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
                 <div>
+                  <p className="text-white/80 text-sm font-medium text-gold-400 mb-1">Branch</p>
                   <p className="text-white/80 text-sm">No. 10, 1st Cross Street,</p>
                   <p className="text-white/80 text-sm">Kalyan Nagar, West Tambaram,</p>
                   <p className="text-white/80 text-sm">Chennai - 600 045.</p>

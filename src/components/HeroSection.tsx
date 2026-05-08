@@ -96,7 +96,7 @@ export default function HeroSection() {
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
-              href="tel:+919123456789"
+              href="tel:+919384854560"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 font-tamil"
             >
               <Phone className="w-5 h-5" />

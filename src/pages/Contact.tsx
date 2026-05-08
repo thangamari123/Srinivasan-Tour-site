@@ -6,7 +6,7 @@ const contactInfo = [
   {
     icon: Phone,
     title: 'தொலைபேசி',
-    lines: ['+91 91234 56789'],
+    lines: ['+91 93848 54560'],
     color: 'from-blue-400 to-indigo-500',
   },
   {
@@ -63,7 +63,7 @@ export default function Contact() {
     if (validate()) {
       // Redirect to WhatsApp
       const whatsappMessage = `வணக்கம்! என் பெயர் ${formData.name}. %0Aதொலைபேசி: ${formData.phone} %0Aசெய்தி: ${formData.message}`;
-      const whatsappUrl = `https://wa.me/919123456789?text=${whatsappMessage}`;
+      const whatsappUrl = `https://wa.me/919384854560?text=${whatsappMessage}`;
       
       window.open(whatsappUrl, '_blank');
       
@@ -201,7 +201,7 @@ export default function Contact() {
                         setFormData({ ...formData, phone: e.target.value });
                         if (errors.phone) setErrors({ ...errors, phone: '' });
                       }}
-                      placeholder="9123456789"
+                      placeholder="9384854560"
                       className={`w-full px-4 py-3 rounded-xl border ${
                         errors.phone ? 'border-red-400 bg-red-50/50' : 'border-navy-100 bg-navy-50/30'
                       } focus:outline-none focus:ring-2 focus:ring-navy-400/30 focus:border-navy-400 transition-all font-tamil text-sm text-navy-950 placeholder:text-navy-400/40`}

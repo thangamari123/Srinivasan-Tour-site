@@ -1,27 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { getPackageBySlug } from '../data/packages';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getPackageBySlug, getPackagesByCategory } from '../data/packages';
 import {
   Clock, MapPin, CheckCircle, XCircle, Phone,
   ArrowLeft, ArrowRight, Bus, Bed, Utensils, Compass,
-  Calendar, Star, Shield, ChevronLeft, ChevronRight, X, Play, Pause, Volume2, VolumeX, Download
+  Calendar, Star, Shield, ChevronLeft, ChevronRight, X, Play, Pause, Volume2, VolumeX, Download, Users
 } from 'lucide-react';
 
 export default function PackageDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const pkg = slug ? getPackageBySlug(slug) : undefined;
+  
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
 
   if (!pkg) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-navy-50">
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
         <div className="text-center">
-          <h1 className="font-tamil text-3xl font-bold text-navy-950 mb-4">தொகுப்பு கிடைக்கவில்லை</h1>
-          <p className="font-tamil text-navy-600/60 mb-6">தவறான இணைப்பு அல்லது தொகுப்பு நீக்கப்பட்டிருக்கலாம்</p>
+          <h1 className="font-tamil text-3xl font-bold text-[#1E293B] mb-4">தொகுப்பு கிடைக்கவில்லை</h1>
+          <p className="font-tamil text-gray-500 mb-6">தவறான இணைப்பு அல்லது தொகுப்பு நீக்கப்பட்டிருக்கலாம்</p>
           <Link
             to="/packages"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-navy-400 to-navy-600 text-white font-semibold rounded-xl font-tamil"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#2E7D32] text-white font-semibold rounded-xl font-tamil"
           >
             <ArrowLeft className="w-4 h-4" />
             தொகுப்புகளுக்கு திரும்பு
@@ -31,336 +37,263 @@ export default function PackageDetail() {
     );
   }
 
+  const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
+  const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
+  const activeImage = displayImages[activeImageIndex];
+  
+  const relatedPackages = getPackagesByCategory(pkg.category).filter(p => p.slug !== pkg.slug).slice(0, 3);
+
   return (
-    <>
-      {/* Hero */}
-      <section className="relative pt-32 pb-24 bg-navy-950 overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={pkg.image}
-            alt={pkg.title}
-            className="w-full h-full object-cover opacity-25"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-950/70 via-navy-950/85 to-navy-950" />
-        </div>
+    <div className="bg-[#F8FAFC] min-h-screen text-[#1E293B] font-sans pb-24 pt-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-[#2E7D32] transition-colors font-tamil mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          திரும்ப செல்க
+        </button>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-sm mb-8"
-          >
-            <Link to="/" className="text-white/50 hover:text-gold-400 font-tamil transition-colors">முகப்பு</Link>
-            <span className="text-white/30">/</span>
-            <Link to="/packages" className="text-white/50 hover:text-gold-400 font-tamil transition-colors">தொகுப்புகள்</Link>
-            <span className="text-white/30">/</span>
-            <span className="text-gold-400 font-tamil">{pkg.title}</span>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-            {/* Left Content */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="lg:col-span-2"
-            >
-              <span className={`inline-block px-3 py-1 ${pkg.tagColor} text-white text-xs font-bold rounded-full font-tamil mb-4`}>
-                {pkg.categoryTag}
-              </span>
-              <h1 className="font-tamil text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {pkg.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white text-sm rounded-xl font-tamil">
-                  <Clock className="w-4 h-4 text-gold-400" />
-                  {pkg.duration}
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white text-sm rounded-xl font-tamil">
-                  <MapPin className="w-4 h-4 text-gold-400" />
-                  {pkg.categoryTag} தொகுப்பு
-                </span>
+        {/* Header */}
+        <div className="mb-8">
+          <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-sm font-bold rounded-full font-tamil mb-3">
+            {pkg.duration}
+          </span>
+          <h1 className="text-3xl md:text-5xl font-bold text-[#1E293B] mb-4 font-tamil">
+            {pkg.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-4 text-sm font-tamil text-gray-600">
+            <span className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-gray-200">
+              <MapPin className="w-4 h-4 text-[#2E7D32]" />
+              {pkg.categoryTag}
+            </span>
+            <div className="flex items-center gap-1">
+              <div className="flex items-center text-yellow-400">
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-4 h-4 fill-current" />
               </div>
-              <p className="font-tamil text-white/70 text-lg leading-relaxed max-w-2xl">
-                {pkg.fullDescription}
-              </p>
-            </motion.div>
-
-            {/* Right - Booking Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="lg:col-span-1"
-            >
-              <div className="p-5 sm:p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 shadow-2xl">
-                <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-gold-400 to-gold-500 mb-3">
-                    <Phone className="w-7 h-7 sm:w-8 sm:h-8 text-navy-950" />
-                  </div>
-                  <p className="font-tamil text-white font-bold text-lg">இப்போதே பதிவு செய்யுங்கள்</p>
-                  <p className="font-tamil text-white/50 text-sm mt-1">சிறந்த விலைக்கு எங்களை தொடர்பு கொள்ளுங்கள்</p>
-                </div>
-                <a
-                  href="tel:+919123456789"
-                  className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-105 font-tamil mb-3"
-                >
-                  <Phone className="w-5 h-5" />
-                  இப்போதே அழைக்கவும்
-                </a>
-                <Link
-                  to="/contact"
-                  className="flex items-center justify-center gap-2 w-full py-4 bg-white/10 text-white font-bold text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 font-tamil"
-                >
-                  விசாரனை அனுப்புங்கள்
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </motion.div>
+              <span className="text-gray-500 ml-1">(120+ Reviews)</span>
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* Highlights & Details */}
-      <section className="py-16 bg-navy-50/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-10">
-              {/* Highlights */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-8 rounded-3xl bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30"
-              >
-                <h2 className="font-tamil text-2xl font-bold text-navy-950 mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 to-gold-500 flex items-center justify-center">
-                    <Star className="w-5 h-5 text-navy-950" />
-                  </div>
-                  சிறப்பம்சங்கள்
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {pkg.highlights.map((highlight) => (
-                    <div key={highlight} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
-                      <span className="font-tamil text-navy-700 text-sm">{highlight}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Itinerary */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-8 rounded-3xl bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30"
-              >
-                <h2 className="font-tamil text-2xl font-bold text-navy-950 mb-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-navy-400 to-navy-600 flex items-center justify-center">
-                    <Compass className="w-5 h-5 text-white" />
-                  </div>
-                  பயண அட்டவணை
-                </h2>
-                <div className="space-y-0">
-                  {pkg.itinerary.map((item, index) => (
-                    <div key={index} className="flex gap-4">
-                      {/* Timeline */}
-                      <div className="flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-navy-400 to-navy-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
-                          {index + 1}
-                        </div>
-                        {index < pkg.itinerary.length - 1 && (
-                          <div className="w-0.5 h-full bg-navy-200 my-1" />
-                        )}
-                      </div>
-                      {/* Content */}
-                      <div className={`pb-8 ${index === pkg.itinerary.length - 1 ? 'pb-0' : ''}`}>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-tamil text-navy-400 text-xs font-semibold">{item.day}</span>
-                        </div>
-                        <h3 className="font-tamil text-navy-950 font-bold text-base mb-1">{item.title}</h3>
-                        <p className="font-tamil text-navy-600/60 text-sm leading-relaxed">{item.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
+        {/* 2 Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-10">
+            
+            {/* Hero Gallery */}
+            <div className="space-y-4">
+              <div className="aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-100 relative">
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={activeImageIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    src={activeImage} 
+                    alt={pkg.title} 
+                    className="absolute inset-0 w-full h-full object-cover" 
+                  />
+                </AnimatePresence>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {displayImages.map((img, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`w-24 h-20 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shrink-0 border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#2E7D32] ring-2 ring-[#E8F5E9]' : 'border-transparent opacity-60 hover:opacity-100 hover:border-[#2E7D32]/50'}`}
+                  >
+                    <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Inclusions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-6 rounded-3xl bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30"
-              >
-                <h3 className="font-tamil text-lg font-bold text-navy-950 mb-4 flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
-                  உள்ளடக்கங்கள்
-                </h3>
-                <ul className="space-y-3">
-                  {pkg.inclusions.map((item) => {
-                    const iconMap: Record<string, typeof Bus> = {
-                      'போக்குவரத்து': Bus,
-                      'விமானம்': Bus,
-                      'தங்குமிடம்': Bed,
-                      'ரிசோர்ட்': Bed,
-                      'உணவு': Utensils,
-                    };
-                    const Icon = iconMap[item] || CheckCircle;
-                    return (
-                      <li key={item} className="flex items-center gap-2.5">
-                        <Icon className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span className="font-tamil text-navy-700 text-sm">{item}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </motion.div>
+            {/* Quick Info Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                   <Compass className="w-5 h-5 text-[#2E7D32]" />
+                 </div>
+                 <span className="text-xs text-gray-500 font-tamil">பயண வகை</span>
+                 <span className="text-sm font-bold text-[#1E293B] font-tamil">{pkg.categoryTag}</span>
+               </div>
+               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                   <Users className="w-5 h-5 text-[#2E7D32]" />
+                 </div>
+                 <span className="text-xs text-gray-500 font-tamil">குழு அளவு</span>
+                 <span className="text-sm font-bold text-[#1E293B] font-tamil">20-30 நபர்கள்</span>
+               </div>
+               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                   <Bed className="w-5 h-5 text-[#2E7D32]" />
+                 </div>
+                 <span className="text-xs text-gray-500 font-tamil">தங்குமிடம்</span>
+                 <span className="text-sm font-bold text-[#1E293B] font-tamil">உயர்தர ஹோட்டல்</span>
+               </div>
+               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                   <Bus className="w-5 h-5 text-[#2E7D32]" />
+                 </div>
+                 <span className="text-xs text-gray-500 font-tamil">போக்குவரத்து</span>
+                 <span className="text-sm font-bold text-[#1E293B] font-tamil">A/C பேருந்து</span>
+               </div>
+            </div>
 
-              {/* Exclusions */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-6 rounded-3xl bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30"
-              >
-                <h3 className="font-tamil text-lg font-bold text-navy-950 mb-4 flex items-center gap-2">
-                  <XCircle className="w-5 h-5 text-red-400" />
-                  உள்ளடக்கம் அல்லாதவை
-                </h3>
+            {/* Overview */}
+            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold mb-4 font-tamil text-[#1E293B]">Overview</h2>
+              <p className="text-gray-600 leading-relaxed font-tamil text-lg">
+                {pkg.fullDescription}
+              </p>
+            </section>
+
+            {/* Highlights */}
+            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold mb-6 font-tamil text-[#1E293B]">சிறப்பம்சங்கள் (Highlights)</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {pkg.highlights.map(h => (
+                  <div key={h} className="flex items-start gap-3 bg-[#E8F5E9]/40 p-4 rounded-xl border border-[#2E7D32]/10 transition-colors hover:bg-[#E8F5E9]">
+                    <CheckCircle className="w-5 h-5 text-[#2E7D32] shrink-0 mt-0.5" />
+                    <span className="font-tamil text-[#1E293B] font-medium leading-relaxed">{h}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Itinerary */}
+            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+              <h2 className="text-2xl font-bold mb-8 font-tamil text-[#1E293B]">பயண அட்டவணை (Itinerary)</h2>
+              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.125rem] sm:before:ml-6 before:-translate-x-px before:h-full before:w-0.5 before:bg-gray-200">
+                 {pkg.itinerary.map((item, index) => (
+                   <div key={index} className="relative flex gap-6 items-start">
+                     {/* Timeline Dot */}
+                     <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white border-4 border-[#E8F5E9] shrink-0 flex items-center justify-center shadow-sm relative z-10 mt-1">
+                       <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#2E7D32]" />
+                     </div>
+                     {/* Content Card */}
+                     <div className="bg-gray-50/50 hover:bg-[#F8FAFC] p-5 sm:p-6 rounded-2xl border border-gray-100 w-full transition-all duration-300 hover:shadow-md hover:border-[#2E7D32]/20 group">
+                       <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs font-bold rounded-md font-tamil mb-3">{item.day}</span>
+                       <h3 className="font-tamil text-[#1E293B] font-bold text-lg mb-2 group-hover:text-[#2E7D32] transition-colors">{item.title}</h3>
+                       <p className="font-tamil text-gray-600 leading-relaxed text-sm sm:text-base">{item.description}</p>
+                     </div>
+                   </div>
+                 ))}
+              </div>
+            </section>
+
+          </div>
+
+          {/* Right Column (Sidebar) */}
+          <div className="lg:col-span-1 space-y-6 relative">
+            
+            <div className="sticky top-28 space-y-6">
+              {/* Price Card */}
+              <div className="bg-white p-6 rounded-3xl shadow-lg shadow-black/5 border border-gray-100">
+                <div className="mb-6 pb-6 border-b border-gray-100 text-center">
+                  <p className="text-gray-500 text-sm mb-1 font-tamil">தொகுப்பு விலை</p>
+                  <h3 className="text-3xl font-bold text-[#2E7D32] font-tamil">{pkg.price}</h3>
+                  <p className="text-xs text-gray-400 mt-2 font-tamil">{pkg.priceNote}</p>
+                </div>
+                <div className="space-y-3">
+                  <a href="tel:+919384854560" className="flex items-center justify-center gap-2 w-full bg-[#2E7D32] text-white py-3.5 rounded-xl font-bold hover:bg-[#1B5E20] transition-all hover:scale-[1.02] transform duration-300 shadow-md shadow-[#2E7D32]/20 font-tamil">
+                    <Phone className="w-4 h-4" />
+                    இப்போதே அழைக்கவும்
+                  </a>
+                  <Link to="/contact" className="flex items-center justify-center gap-2 w-full border border-[#2E7D32] text-[#2E7D32] py-3.5 rounded-xl font-bold hover:bg-[#E8F5E9] transition-colors font-tamil">
+                    விசாரனை அனுப்புங்கள்
+                  </Link>
+                </div>
+              </div>
+
+              {/* Inclusions */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold mb-4 font-tamil text-[#1E293B]">உள்ளடக்கங்கள் (Includes)</h3>
                 <ul className="space-y-3">
-                  {pkg.exclusions.map((item) => (
-                    <li key={item} className="flex items-center gap-2.5">
-                      <XCircle className="w-4 h-4 text-red-300 shrink-0" />
-                      <span className="font-tamil text-navy-600/60 text-sm">{item}</span>
+                  {pkg.inclusions.map(inc => (
+                    <li key={inc} className="flex items-start gap-3 text-sm font-tamil text-gray-600">
+                      <CheckCircle className="w-5 h-5 text-[#2E7D32] shrink-0" />
+                      <span className="mt-0.5">{inc}</span>
                     </li>
                   ))}
                 </ul>
-              </motion.div>
+              </div>
 
-              {/* Quick Info */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-6 rounded-3xl bg-gradient-to-br from-navy-800 to-navy-900 border border-white/10"
-              >
-                <h3 className="font-tamil text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-gold-400" />
-                  முக்கிய தகவல்
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span className="font-tamil text-white/70 text-sm">{pkg.duration}</span>
+              {/* Exclusions */}
+              <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                <h3 className="text-lg font-bold mb-4 font-tamil text-[#1E293B]">உள்ளடக்கம் அல்லாதவை (Excludes)</h3>
+                <ul className="space-y-3">
+                  {pkg.exclusions.map(exc => (
+                    <li key={exc} className="flex items-start gap-3 text-sm font-tamil text-gray-500">
+                      <XCircle className="w-5 h-5 text-red-400 shrink-0" />
+                      <span className="mt-0.5">{exc}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Contact Card */}
+              <div className="bg-[#E8F5E9] p-6 rounded-3xl shadow-sm border border-[#2E7D32]/10 text-center">
+                <h3 className="text-lg font-bold text-[#2E7D32] mb-1 font-tamil">உதவி தேவையா?</h3>
+                <p className="text-sm text-[#2E7D32]/80 mb-5 font-tamil">அழைக்க அல்லது WhatsApp செய்யவும்</p>
+                <a href="tel:+919384854560" className="inline-flex items-center justify-center gap-2 text-xl font-bold text-[#1E293B] mb-5 hover:text-[#2E7D32] transition-colors">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                    <Phone className="w-5 h-5 text-[#2E7D32]" />
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
-                    <span className="font-tamil text-white/70 text-sm">
-                      {pkg.months && pkg.months.length > 0 
-                        ? `மாதங்கள்: ${pkg.months.join(', ')}`
-                        : 'தினமும் புறப்படுகிறது'}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Bus className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span className="font-tamil text-white/70 text-sm">முழு போக்குவரத்து</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Bed className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span className="font-tamil text-white/70 text-sm">உயர்தர தங்குமிடம்</span>
+                  +91 93848 54560
+                </a>
+                <button className="w-full bg-white text-[#2E7D32] py-3 rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-all font-tamil border border-white hover:border-[#2E7D32]/20">
+                  WhatsApp Us
+                </button>
+              </div>
+
+              {/* Related Packages */}
+              {relatedPackages.length > 0 && (
+                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+                  <h3 className="text-lg font-bold mb-4 font-tamil text-[#1E293B]">தொடர்புடைய தொகுப்புகள்</h3>
+                  <div className="space-y-4">
+                    {relatedPackages.map(rel => (
+                      <Link to={`/package/${rel.slug}`} key={rel.slug} className="group flex gap-3 p-2 rounded-2xl hover:bg-gray-50 transition-colors">
+                        <img src={rel.image} alt={rel.title} className="w-20 h-20 rounded-xl object-cover shadow-sm" />
+                        <div className="flex-1 py-1">
+                          <h4 className="font-tamil font-bold text-[#1E293B] text-sm group-hover:text-[#2E7D32] transition-colors line-clamp-1">{rel.title}</h4>
+                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-2 font-tamil">
+                            <Clock className="w-3 h-3" /> {rel.duration}
+                          </div>
+                          <span className="text-[#2E7D32] text-xs font-bold font-tamil group-hover:underline">விவரங்கள் &rarr;</span>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
                 </div>
-              </motion.div>
+              )}
 
-              {/* CTA */}
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-gold-400 to-gold-500 text-center">
-                <p className="font-tamil text-navy-950 font-bold text-lg mb-2">இப்போதே பதிவு செய்யுங்கள்!</p>
-                <p className="font-tamil text-navy-950/70 text-sm mb-4">உங்கள் இடத்தை உறுதி செய்ய எங்களை தொடர்பு கொள்ளுங்கள்</p>
-                <a
-                  href="tel:+919123456789"
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-navy-950 text-gold-400 font-bold text-sm rounded-xl hover:bg-navy-800 transition-colors font-tamil"
-                >
-                  <Phone className="w-4 h-4" />
-                  +91 91234 56789
-                </a>
-              </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Image Gallery - Sliding Carousel */}
-      <section className="py-16 bg-navy-950 relative overflow-hidden">
-        {/* Decorative */}
-        <div className="absolute top-0 left-1/4 w-80 h-80 bg-gold-400/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-navy-400/5 rounded-full blur-[100px]" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <span className="inline-block px-4 py-1.5 bg-gold-400/10 border border-gold-400/20 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4">
-              புகைப்படங்கள்
-            </span>
-            <h2 className="font-tamil text-2xl sm:text-3xl font-bold text-white">
-              பயண புகைப்படங்கள்
-            </h2>
-          </motion.div>
-
-          {/* Carousel */}
-          <GalleryCarousel images={imagesByPackage[pkg.slug] || pkg.images} title={pkg.title} />
-        </div>
-      </section>
-
-      {/* Video Reels Section */}
-      <section className="py-20 bg-white relative overflow-hidden">
-        <div className="absolute inset-0 pattern-dots opacity-30" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <span className="inline-block px-4 py-1.5 bg-navy-400/10 text-navy-400 text-sm font-semibold rounded-full font-tamil mb-4">
-              பயணிகள் கருத்துக்கள்
-            </span>
-            <h2 className="font-tamil text-2xl sm:text-3xl font-bold text-navy-950 mb-3">
-              எங்கள் பயணிகள் சொல்வது
-            </h2>
-            <p className="font-tamil text-navy-600/60 text-base max-w-xl mx-auto">
-              எங்கள் பயணிகளின் நிஜமான அனுபவங்களை வீடியோவில் காணுங்கள்
-            </p>
-          </motion.div>
-
+      </div>
+      
+      {/* Bottom Section - Video Reels */}
+      <div className="bg-white border-t border-gray-200 mt-20 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs font-bold rounded-full font-tamil mb-3">பயணிகள் கருத்துக்கள்</span>
+            <h2 className="font-tamil text-3xl font-bold text-[#1E293B] mb-2">எங்கள் பயணிகள் சொல்வது</h2>
+            <p className="font-tamil text-gray-500 text-sm">பயணிகளின் நிஜமான அனுபவங்களை வீடியோவில் காணுங்கள்</p>
+          </div>
           <VideoReels category={pkg.category} slug={pkg.slug} />
         </div>
-      </section>
-
-      {/* Back Button */}
-      <section className="py-10 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-navy-950 text-white font-semibold text-sm rounded-xl hover:bg-navy-400 transition-colors font-tamil"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            திரும்ப செல்க
-          </button>
-        </div>
-      </section>
-    </>
+      </div>
+    </div>
   );
 }
 

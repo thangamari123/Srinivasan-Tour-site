@@ -47,7 +47,7 @@ export default function Navbar() {
     const domain = window.location.hostname === 'localhost' ? '' : `domain=.${window.location.hostname.split('.').slice(-2).join('.')};`;
     document.cookie = `googtrans=/ta/${lang.code}; ${domain}path=/`;
     document.cookie = `googtrans=/ta/${lang.code}; path=/`; // Fallback for various path levels
-    
+
     // Refresh to apply translation
     window.location.reload();
   };
@@ -75,11 +75,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 font-tamil ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 font-tamil ${scrolled
           ? 'bg-navy-950/95 backdrop-blur-xl shadow-2xl shadow-navy-950/20'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
@@ -102,11 +101,10 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  location.pathname === link.path
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${location.pathname === link.path
                     ? 'text-gold-400 bg-white/10'
                     : 'text-white/80 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -127,19 +125,17 @@ export default function Navbar() {
               </button>
 
               <div
-                className={`absolute right-0 mt-2 w-36 bg-navy-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 origin-top-right z-50 ${
-                  isLangOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
-                }`}
+                className={`absolute right-0 mt-2 w-36 bg-navy-900/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 origin-top-right z-50 ${isLangOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+                  }`}
               >
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
                     onClick={() => handleLanguageChange(lang)}
-                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-all duration-200 flex items-center justify-between ${
-                      currentLang.code === lang.code
+                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-all duration-200 flex items-center justify-between ${currentLang.code === lang.code
                         ? 'text-gold-400 bg-white/10'
                         : 'text-white/80 hover:bg-white/5 hover:text-white'
-                    }`}
+                      }`}
                   >
                     {lang.name}
                     {currentLang.code === lang.code && <div className="w-1.5 h-1.5 rounded-full bg-gold-400" />}
@@ -149,7 +145,7 @@ export default function Navbar() {
             </div>
 
             <a
-              href="tel:+919123456789"
+              href="tel:+919384854560"
               className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm rounded-xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-105"
             >
               <Phone className="w-4 h-4" />
@@ -168,9 +164,8 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`lg:hidden transition-all duration-300 overflow-hidden ${
-          isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <div className="bg-navy-950/98 backdrop-blur-xl border-t border-white/5 px-4 py-6 space-y-4">
           <div className="grid grid-cols-1 gap-1">
@@ -178,11 +173,10 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`block px-4 py-3 rounded-xl text-center text-base font-semibold transition-all ${
-                  location.pathname === link.path
+                className={`block px-4 py-3 rounded-xl text-center text-base font-semibold transition-all ${location.pathname === link.path
                     ? 'text-gold-400 bg-white/10'
                     : 'text-white/80 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -196,11 +190,10 @@ export default function Navbar() {
                 <button
                   key={lang.code}
                   onClick={() => handleLanguageChange(lang)}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${
-                    currentLang.code === lang.code
+                  className={`flex-1 py-2.5 rounded-lg text-sm font-bold transition-all duration-300 ${currentLang.code === lang.code
                       ? 'bg-gold-400 text-navy-950 shadow-lg shadow-gold-500/20'
                       : 'text-white/60 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {lang.name}
                 </button>
@@ -208,7 +201,7 @@ export default function Navbar() {
             </div>
 
             <a
-              href="tel:+919123456789"
+              href="tel:+919384854560"
               className="flex items-center justify-center gap-2 w-full px-5 py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm rounded-xl shadow-lg shadow-gold-500/25 active:scale-95 transition-transform"
             >
               <Phone className="w-4 h-4" />

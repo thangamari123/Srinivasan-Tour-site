@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Clock, Users, ArrowRight, Bookmark, Bed, Utensils, Bus, MapPin } from 'lucide-react';
 import { getFeaturedPackages } from '../data/packages';
+import HoverImageSlider from './HoverImageSlider';
 
 const categoryStyles: Record<string, { badge: string; icon: string }> = {
   'யாத்திரை': { badge: 'from-amber-400 to-orange-500', icon: 'text-amber-500' },
@@ -75,13 +76,10 @@ export default function FeaturedPackages() {
 
                   {/* Image Section (42% height) */}
                   <div className="relative h-[220px] overflow-hidden">
-                    <img
-                      src={pkg.image}
-                      alt={pkg.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
+                    <HoverImageSlider images={pkg.images && pkg.images.length > 0 ? pkg.images : [pkg.image]} title={pkg.title} />
+
                     {/* Bottom fade overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
 
                     {/* Category Badge - Top Left */}
                     <span className={`absolute top-3 left-3 inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r ${style.badge} text-white text-[11px] font-bold rounded-full shadow-md`}>
