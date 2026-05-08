@@ -260,9 +260,13 @@ export default function PackageDetail() {
                     <Clock className="w-4 h-4 text-gold-400 shrink-0" />
                     <span className="font-tamil text-white/70 text-sm">{pkg.duration}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span className="font-tamil text-white/70 text-sm">தினமும் புறப்படுகிறது</span>
+                  <div className="flex items-start gap-3">
+                    <Calendar className="w-4 h-4 text-gold-400 shrink-0 mt-0.5" />
+                    <span className="font-tamil text-white/70 text-sm">
+                      {pkg.months && pkg.months.length > 0 
+                        ? `மாதங்கள்: ${pkg.months.join(', ')}`
+                        : 'தினமும் புறப்படுகிறது'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Bus className="w-4 h-4 text-gold-400 shrink-0" />

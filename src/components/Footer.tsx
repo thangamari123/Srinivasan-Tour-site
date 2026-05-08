@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
+import { Phone, MapPin, Facebook, Instagram, Youtube } from 'lucide-react';
 
 const quickLinks = [
   { name: 'முகப்பு', path: '/' },
@@ -94,18 +94,27 @@ export default function Footer() {
             <h4 className="text-gold-400 font-bold text-sm uppercase tracking-wider mb-5">தொடர்பு</h4>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <Phone className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
+                <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
                 <div>
-                  <p className="text-white/80 text-sm">+91 91234 56789</p>
+                  <p className="text-white/80 text-sm font-medium text-gold-400 mb-1">SRINIVASA TOUR OPERATORS</p>
+                  <p className="text-white/80 text-sm">#19/34, Venkataraman Street,</p>
+                  <p className="text-white/80 text-sm">Perambur, Chennai - 600 011.</p>
+                  <p className="text-white/60 text-xs mt-0.5">(Opp. Railway Station & Bus Stand)</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <Mail className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                <p className="text-white/80 text-sm">info@srinivasatours.com</p>
+                <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-white/80 text-sm">No. 10, 1st Cross Street,</p>
+                  <p className="text-white/80 text-sm">Kalyan Nagar, West Tambaram,</p>
+                  <p className="text-white/80 text-sm">Chennai - 600 045.</p>
+                </div>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                <p className="text-white/80 text-sm">123, காந்தி சாலை, சென்னை - 600001</p>
+                <Phone className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-white/80 text-sm">93848 54560, 93848 54561</p>
+                </div>
               </li>
             </ul>
           </div>
