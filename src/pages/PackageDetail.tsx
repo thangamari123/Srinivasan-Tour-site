@@ -5,7 +5,7 @@ import { getPackageBySlug, getPackagesByCategory } from '../data/packages';
 import {
   Clock, MapPin, CheckCircle, XCircle, Phone,
   ArrowLeft, ArrowRight, Bus, Bed, Utensils, Compass,
-  Calendar, Star, Shield, ChevronLeft, ChevronRight, X, Play, Pause, Volume2, VolumeX, Download, Users
+  Calendar, Star, Shield, ChevronLeft, ChevronRight, X, Play, Pause, Volume2, VolumeX, Download
 } from 'lucide-react';
 
 export default function PackageDetail() {
@@ -18,6 +18,20 @@ export default function PackageDetail() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
+
+  useEffect(() => {
+    if (!pkg) return;
+    const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
+    const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
+    
+    if (displayImages.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveImageIndex((prev) => (prev + 1) % displayImages.length);
+    }, 4000);
+    
+    return () => clearInterval(interval);
+  }, [pkg, slug]);
 
   if (!pkg) {
     return (
@@ -57,11 +71,11 @@ export default function PackageDetail() {
         </button>
 
         {/* Header */}
-        <div className="mb-8">
-          <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-sm font-bold rounded-full font-tamil mb-3">
+        <div className="mb-6 sm:mb-8">
+          <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs sm:text-sm font-bold rounded-full font-tamil mb-2 sm:mb-3">
             {pkg.duration}
           </span>
-          <h1 className="text-3xl md:text-5xl font-bold text-[#1E293B] mb-4 font-tamil">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#1E293B] mb-3 sm:mb-4 font-tamil">
             {pkg.title}
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm font-tamil text-gray-600">
@@ -90,7 +104,7 @@ export default function PackageDetail() {
             
             {/* Hero Gallery */}
             <div className="space-y-4">
-              <div className="aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-100 relative">
+              <div className="aspect-[2048/1365] w-full rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-100 relative group">
                 <AnimatePresence mode="wait">
                   <motion.img 
                     key={activeImageIndex}
@@ -103,6 +117,7 @@ export default function PackageDetail() {
                     className="absolute inset-0 w-full h-full object-cover" 
                   />
                 </AnimatePresence>
+
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {displayImages.map((img, idx) => (
@@ -118,20 +133,13 @@ export default function PackageDetail() {
             </div>
 
             {/* Quick Info Row */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
                  <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
                    <Compass className="w-5 h-5 text-[#2E7D32]" />
                  </div>
                  <span className="text-xs text-gray-500 font-tamil">பயண வகை</span>
                  <span className="text-sm font-bold text-[#1E293B] font-tamil">{pkg.categoryTag}</span>
-               </div>
-               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
-                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                   <Users className="w-5 h-5 text-[#2E7D32]" />
-                 </div>
-                 <span className="text-xs text-gray-500 font-tamil">குழு அளவு</span>
-                 <span className="text-sm font-bold text-[#1E293B] font-tamil">20-30 நபர்கள்</span>
                </div>
                <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
                  <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
@@ -256,26 +264,7 @@ export default function PackageDetail() {
                 </button>
               </div>
 
-              {/* Related Packages */}
-              {relatedPackages.length > 0 && (
-                <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                  <h3 className="text-lg font-bold mb-4 font-tamil text-[#1E293B]">தொடர்புடைய தொகுப்புகள்</h3>
-                  <div className="space-y-4">
-                    {relatedPackages.map(rel => (
-                      <Link to={`/package/${rel.slug}`} key={rel.slug} className="group flex gap-3 p-2 rounded-2xl hover:bg-gray-50 transition-colors">
-                        <img src={rel.image} alt={rel.title} className="w-20 h-20 rounded-xl object-cover shadow-sm" />
-                        <div className="flex-1 py-1">
-                          <h4 className="font-tamil font-bold text-[#1E293B] text-sm group-hover:text-[#2E7D32] transition-colors line-clamp-1">{rel.title}</h4>
-                          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-2 font-tamil">
-                            <Clock className="w-3 h-3" /> {rel.duration}
-                          </div>
-                          <span className="text-[#2E7D32] text-xs font-bold font-tamil group-hover:underline">விவரங்கள் &rarr;</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
             </div>
           </div>
