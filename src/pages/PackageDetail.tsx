@@ -12,7 +12,7 @@ export default function PackageDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const pkg = slug ? getPackageBySlug(slug) : undefined;
-  
+
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
@@ -23,13 +23,13 @@ export default function PackageDetail() {
     if (!pkg) return;
     const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
     const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
-    
+
     if (displayImages.length <= 1) return;
-    
+
     const interval = setInterval(() => {
       setActiveImageIndex((prev) => (prev + 1) % displayImages.length);
     }, 4000);
-    
+
     return () => clearInterval(interval);
   }, [pkg, slug]);
 
@@ -54,13 +54,13 @@ export default function PackageDetail() {
   const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
   const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
   const activeImage = displayImages[activeImageIndex];
-  
+
   const relatedPackages = getPackagesByCategory(pkg.category).filter(p => p.slug !== pkg.slug).slice(0, 3);
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen text-[#1E293B] font-sans pb-24 pt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -98,31 +98,31 @@ export default function PackageDetail() {
 
         {/* 2 Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          
+
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-10">
-            
+
             {/* Hero Gallery */}
             <div className="space-y-4">
               <div className="aspect-[2048/1365] w-full rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-gray-100 relative group">
                 <AnimatePresence mode="wait">
-                  <motion.img 
+                  <motion.img
                     key={activeImageIndex}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.4 }}
-                    src={activeImage} 
-                    alt={pkg.title} 
-                    className="absolute inset-0 w-full h-full object-cover" 
+                    src={activeImage}
+                    alt={pkg.title}
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </AnimatePresence>
 
               </div>
               <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
                 {displayImages.map((img, idx) => (
-                  <button 
-                    key={idx} 
+                  <button
+                    key={idx}
                     onClick={() => setActiveImageIndex(idx)}
                     className={`w-24 h-20 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shrink-0 border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#2E7D32] ring-2 ring-[#E8F5E9]' : 'border-transparent opacity-60 hover:opacity-100 hover:border-[#2E7D32]/50'}`}
                   >
@@ -134,27 +134,27 @@ export default function PackageDetail() {
 
             {/* Quick Info Row */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
-                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                   <Compass className="w-5 h-5 text-[#2E7D32]" />
-                 </div>
-                 <span className="text-xs text-gray-500 font-tamil">பயண வகை</span>
-                 <span className="text-sm font-bold text-[#1E293B] font-tamil">{pkg.categoryTag}</span>
-               </div>
-               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
-                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                   <Bed className="w-5 h-5 text-[#2E7D32]" />
-                 </div>
-                 <span className="text-xs text-gray-500 font-tamil">தங்குமிடம்</span>
-                 <span className="text-sm font-bold text-[#1E293B] font-tamil">உயர்தர ஹோட்டல்</span>
-               </div>
-               <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
-                 <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                   <Bus className="w-5 h-5 text-[#2E7D32]" />
-                 </div>
-                 <span className="text-xs text-gray-500 font-tamil">போக்குவரத்து</span>
-                 <span className="text-sm font-bold text-[#1E293B] font-tamil">A/C பேருந்து</span>
-               </div>
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                  <Compass className="w-5 h-5 text-[#2E7D32]" />
+                </div>
+                <span className="text-xs text-gray-500 font-tamil">பயண வகை</span>
+                <span className="text-sm font-bold text-[#1E293B] font-tamil">{pkg.categoryTag}</span>
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                  <Bed className="w-5 h-5 text-[#2E7D32]" />
+                </div>
+                <span className="text-xs text-gray-500 font-tamil">தங்குமிடம்</span>
+                
+              </div>
+              <div className="bg-white p-4 rounded-2xl border border-gray-100 flex flex-col items-center justify-center text-center gap-2 shadow-sm hover:-translate-y-1 transition-transform">
+                <div className="w-10 h-10 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                  <Bus className="w-5 h-5 text-[#2E7D32]" />
+                </div>
+                <span className="text-xs text-gray-500 font-tamil">போக்குவரத்து</span>
+                <span className="text-sm font-bold text-[#1E293B] font-tamil">A/C பேருந்து</span>
+              </div>
             </div>
 
             {/* Overview */}
@@ -182,20 +182,20 @@ export default function PackageDetail() {
             <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
               <h2 className="text-2xl font-bold mb-8 font-tamil text-[#1E293B]">பயண அட்டவணை (Itinerary)</h2>
               <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.125rem] sm:before:ml-6 before:-translate-x-px before:h-full before:w-0.5 before:bg-gray-200">
-                 {pkg.itinerary.map((item, index) => (
-                   <div key={index} className="relative flex gap-6 items-start">
-                     {/* Timeline Dot */}
-                     <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white border-4 border-[#E8F5E9] shrink-0 flex items-center justify-center shadow-sm relative z-10 mt-1">
-                       <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#2E7D32]" />
-                     </div>
-                     {/* Content Card */}
-                     <div className="bg-gray-50/50 hover:bg-[#F8FAFC] p-5 sm:p-6 rounded-2xl border border-gray-100 w-full transition-all duration-300 hover:shadow-md hover:border-[#2E7D32]/20 group">
-                       <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs font-bold rounded-md font-tamil mb-3">{item.day}</span>
-                       <h3 className="font-tamil text-[#1E293B] font-bold text-lg mb-2 group-hover:text-[#2E7D32] transition-colors">{item.title}</h3>
-                       <p className="font-tamil text-gray-600 leading-relaxed text-sm sm:text-base">{item.description}</p>
-                     </div>
-                   </div>
-                 ))}
+                {pkg.itinerary.map((item, index) => (
+                  <div key={index} className="relative flex gap-6 items-start">
+                    {/* Timeline Dot */}
+                    <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white border-4 border-[#E8F5E9] shrink-0 flex items-center justify-center shadow-sm relative z-10 mt-1">
+                      <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#2E7D32]" />
+                    </div>
+                    {/* Content Card */}
+                    <div className="bg-gray-50/50 hover:bg-[#F8FAFC] p-5 sm:p-6 rounded-2xl border border-gray-100 w-full transition-all duration-300 hover:shadow-md hover:border-[#2E7D32]/20 group">
+                      <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs font-bold rounded-md font-tamil mb-3">{item.day}</span>
+                      <h3 className="font-tamil text-[#1E293B] font-bold text-lg mb-2 group-hover:text-[#2E7D32] transition-colors">{item.title}</h3>
+                      <p className="font-tamil text-gray-600 leading-relaxed text-sm sm:text-base">{item.description}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
 
@@ -203,7 +203,7 @@ export default function PackageDetail() {
 
           {/* Right Column (Sidebar) */}
           <div className="lg:col-span-1 space-y-6 relative">
-            
+
             <div className="sticky top-28 space-y-6">
               {/* Price Card */}
               <div className="bg-white p-6 rounded-3xl shadow-lg shadow-black/5 border border-gray-100">
@@ -270,7 +270,7 @@ export default function PackageDetail() {
           </div>
         </div>
       </div>
-      
+
       {/* Bottom Section - Video Reels */}
       <div className="bg-white border-t border-gray-200 mt-20 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -326,11 +326,10 @@ function GalleryCarousel({ images, title }: { images: string[]; title: string })
           {getVisible().map((item) => (
             <div
               key={`${item.idx}-${item.position}`}
-              className={`rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${
-                item.position === 'current'
+              className={`rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${item.position === 'current'
                   ? 'w-[55%] h-80 shadow-2xl shadow-gold-500/10 border-2 border-gold-400/30 scale-100 z-10'
                   : 'w-[22%] h-64 shadow-lg shadow-navy-950/20 border border-white/10 opacity-50 scale-95 z-0 hover:opacity-70'
-              }`}
+                }`}
               onClick={() => {
                 if (item.position === 'current') {
                   setLightbox(item.src);
@@ -387,11 +386,10 @@ function GalleryCarousel({ images, title }: { images: string[]; title: string })
           <button
             key={index}
             onClick={() => setCurrent(index)}
-            className={`rounded-full transition-all duration-300 ${
-              index === current
+            className={`rounded-full transition-all duration-300 ${index === current
                 ? 'w-8 h-3 bg-gradient-to-r from-gold-400 to-gold-500'
                 : 'w-3 h-3 bg-white/20 hover:bg-white/40'
-            }`}
+              }`}
             aria-label={`Image ${index + 1}`}
           />
         ))}
@@ -759,11 +757,10 @@ function VideoReels({ category, slug }: { category: string, slug?: string }) {
               <button
                 key={index}
                 onClick={(e) => { e.stopPropagation(); openReel(reels[index], index); }}
-                className={`rounded-full transition-all duration-300 ${
-                  index === currentIndex
+                className={`rounded-full transition-all duration-300 ${index === currentIndex
                     ? 'w-6 h-2.5 bg-gold-400'
                     : 'w-2.5 h-2.5 bg-white/30 hover:bg-white/50'
-                }`}
+                  }`}
               />
             ))}
           </div>
