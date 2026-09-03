@@ -44,17 +44,7 @@ export default function HoverImageSlider({ images, title }: HoverImageSliderProp
         />
       </AnimatePresence>
 
-      {/* Progress indicators at bottom */}
-      {isHovered && images.length > 1 && (
-        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-1.5 z-10">
-          {images.map((_, idx) => (
-            <div 
-              key={idx} 
-              className={`h-1 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
-            />
-          ))}
-        </div>
-      )}
+      {/* Indicators removed */}
     </div>
   );
 }

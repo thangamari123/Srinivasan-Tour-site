@@ -30,19 +30,19 @@ const reasons = [
 
 export default function WhyChooseUs() {
   return (
-    <section className="py-24 bg-navy-950 relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-navy-950 relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-400/5 rounded-full blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <motion.span
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4"
+            className="inline-block px-3.5 py-1 bg-gold-400/10 text-gold-400 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-3 sm:mb-4"
           >
             ஏன் எங்களை தேர்வு செய்ய வேண்டும்?
           </motion.span>
@@ -50,7 +50,7 @@ export default function WhyChooseUs() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-tamil text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4"
+            className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4"
           >
             எங்கள் சிறப்பம்சங்கள்
           </motion.h2>
@@ -59,28 +59,28 @@ export default function WhyChooseUs() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white/50 text-lg max-w-2xl mx-auto font-tamil"
+            className="text-white/60 text-sm sm:text-base max-w-2xl mx-auto font-tamil"
           >
             உங்கள் பயணத்தை மேம்படுத்தும் நான்கு காரணங்கள்
           </motion.p>
         </div>
 
-        {/* Reasons Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Reasons Grid - 2 columns on mobile, 4 on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
           {reasons.map((reason, index) => (
             <motion.div
               key={reason.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.15 }}
-              className="group text-center p-8 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-gold-400/20 transition-all duration-500"
+              transition={{ delay: index * 0.08 }}
+              className="group text-center p-3.5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-gold-400/20 transition-all duration-300 flex flex-col items-center justify-start h-full"
             >
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${reason.gradient} shadow-lg mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                <reason.icon className="w-8 h-8 text-white" />
+              <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${reason.gradient} shadow-md mb-2.5 sm:mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                <reason.icon className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
               </div>
-              <h3 className="font-tamil text-xl font-bold text-white mb-3">{reason.title}</h3>
-              <p className="font-tamil text-white/50 text-sm leading-relaxed">{reason.description}</p>
+              <h3 className="font-tamil text-sm sm:text-lg md:text-xl font-bold text-white mb-1.5 sm:mb-2">{reason.title}</h3>
+              <p className="font-tamil text-white/60 text-[11px] sm:text-xs md:text-sm leading-relaxed">{reason.description}</p>
             </motion.div>
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Landmark, MapPin, Globe, ArrowRight } from 'lucide-react';
@@ -42,8 +43,71 @@ const services = [
 ];
 
 export default function ServicesSection() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Automatic sliding for mobile
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && window.innerWidth < 768 && scrollRef.current) {
+        setActiveSlide((prev) => {
+          const nextIndex = (prev + 1) % services.length;
+          const container = scrollRef.current;
+          if (container) {
+            const child = container.children[nextIndex] as HTMLElement | undefined;
+            if (child) {
+              child.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'center',
+              });
+            }
+          }
+          return nextIndex;
+        });
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const container = scrollRef.current;
+    const childCards = container.children;
+    const containerCenter = container.getBoundingClientRect().left + container.clientWidth / 2;
+
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    for (let i = 0; i < childCards.length; i++) {
+      const rect = childCards[i].getBoundingClientRect();
+      const cardCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(containerCenter - cardCenter);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = i;
+      }
+    }
+    setActiveSlide(closestIndex);
+  };
+
+  const scrollToSlide = (index: number) => {
+    setActiveSlide(index);
+    if (scrollRef.current) {
+      const child = scrollRef.current.children[index] as HTMLElement | undefined;
+      if (child) {
+        child.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center',
+        });
+      }
+    }
+  };
+
   return (
-    <section className="py-28 bg-navy-950 relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-navy-950 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-gold-400/5 rounded-full blur-[120px]" />
       <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-navy-400/5 rounded-full blur-[100px]" />
@@ -52,12 +116,12 @@ export default function ServicesSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-10 sm:mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 bg-gold-400/10 border border-gold-400/20 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-6"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-gold-400/10 border border-gold-400/20 text-gold-400 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-4 sm:mb-6"
           >
             <span className="w-2 h-2 rounded-full bg-gold-400" />
             எங்கள் சேவைகள்
@@ -66,7 +130,7 @@ export default function ServicesSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-tamil text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5"
+            className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-5"
           >
             உங்களுக்கான சிறந்த சேவைகள்
           </motion.h2>
@@ -75,25 +139,34 @@ export default function ServicesSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white/50 text-lg max-w-2xl mx-auto font-tamil"
+            className="text-white/60 text-sm sm:text-base max-w-2xl mx-auto font-tamil"
           >
             யாத்திரை முதல் வெளிநாட்டு சுற்றுலா வரை – அனைத்தும் ஒரே இடத்தில்
           </motion.p>
         </div>
 
-        {/* Service Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        {/* Service Cards - Mobile Horizontal Slider / Desktop Grid */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex md:grid md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scrollbar-hide no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-3 md:pb-0"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+          }}
+        >
           {services.map((service, index) => (
             <motion.div
               key={service.title}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.15, duration: 0.6 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              className="w-[84vw] max-w-[340px] sm:w-[380px] md:w-auto shrink-0 snap-center md:shrink"
             >
               <Link
                 to="/packages"
-                className="group relative block rounded-3xl overflow-hidden h-[420px] sm:h-[460px]"
+                className="group relative block rounded-2xl sm:rounded-3xl overflow-hidden h-[340px] sm:h-[400px] md:h-[440px]"
               >
                 {/* Background Image */}
                 <div className="absolute inset-0">
@@ -158,6 +231,22 @@ export default function ServicesSection() {
                 </div>
               </Link>
             </motion.div>
+          ))}
+        </div>
+
+        {/* Mobile Slide Indicator Dots */}
+        <div className="flex md:hidden items-center justify-center gap-2 mt-4">
+          {services.map((service, idx) => (
+            <button
+              key={service.title}
+              onClick={() => scrollToSlide(idx)}
+              aria-label={`Slide ${idx + 1}`}
+              className={`transition-all duration-300 rounded-full ${
+                activeSlide === idx
+                  ? 'w-7 h-2 bg-gradient-to-r from-gold-400 to-amber-500 shadow-sm shadow-gold-500/30'
+                  : 'w-2 h-2 bg-white/20 hover:bg-white/40'
+              }`}
+            />
           ))}
         </div>
       </div>

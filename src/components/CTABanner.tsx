@@ -4,7 +4,7 @@ import { ArrowRight, Phone } from 'lucide-react';
 
 export default function CTABanner() {
   return (
-    <section className="relative py-24 overflow-hidden">
+    <section className="relative py-16 sm:py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-700 to-navy-900" />
       <div className="absolute inset-0 opacity-10">
@@ -18,31 +18,31 @@ export default function CTABanner() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <span className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-6">
+          <span className="inline-block px-3.5 py-1 bg-gold-400/10 text-gold-400 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-4 sm:mb-6">
             இப்போதே தொடங்குங்கள்
           </span>
-          <h2 className="font-tamil text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+          <h2 className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight">
             இப்போதே உங்கள் பயணத்தை{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
               தொடங்குங்கள்
             </span>
           </h2>
-          <p className="font-tamil text-white/60 text-lg max-w-2xl mx-auto mb-10">
+          <p className="font-tamil text-white/70 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
             உங்கள் கனவு பயணத்தை நிஜமாக்க எங்களை தொடர்பு கொள்ளுங்கள். இன்றே உங்கள் இடத்தை உறுதி செய்யுங்கள்!
           </p>
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
             <Link
               to="/contact"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-2xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-105 font-tamil"
+              className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm sm:text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
             >
               இப்போதே பதிவு செய்யுங்கள்
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="tel:+919384854560"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 font-tamil"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-sm sm:text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-[1.02] font-tamil"
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
               அழைக்கவும்
             </a>
           </div>

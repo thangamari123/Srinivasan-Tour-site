@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Bus, Bed, Utensils, ArrowRight } from 'lucide-react';
+import { Clock, Bus, Bed, Utensils, ArrowRight, MapPin } from 'lucide-react';
 import { allPackages } from '../data/packages';
 import HoverImageSlider from '../components/HoverImageSlider';
 
@@ -26,9 +26,9 @@ export default function Packages() {
       const matchDesc = pkg.shortDescription?.toLowerCase().includes(query);
       const matchSlug = pkg.slug?.toLowerCase().includes(query);
       const matchTag = pkg.categoryTag?.toLowerCase().includes(query);
-      const matchHighlights = pkg.highlights?.some(h => h?.toLowerCase().includes(query));
+      const matchPlaces = pkg.placesToVisit?.some(p => p?.toLowerCase().includes(query));
 
-      if (!matchTitle && !matchDesc && !matchSlug && !matchTag && !matchHighlights) {
+      if (!matchTitle && !matchDesc && !matchSlug && !matchTag && !matchPlaces) {
         return false;
       }
     }
@@ -142,64 +142,74 @@ export default function Packages() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
               >
                 {currentPackages.map((pkg, index) => (
                   <motion.div
                     key={pkg.slug}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group rounded-3xl overflow-hidden bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30 hover:shadow-2xl hover:shadow-navy-400/10 transition-all duration-500 hover:-translate-y-2 flex flex-col"
+                    transition={{ delay: Math.min(index * 0.04, 0.4) }}
+                    className="group rounded-2xl overflow-hidden bg-white shadow-md shadow-navy-950/5 border border-navy-100/40 hover:shadow-xl hover:shadow-navy-400/10 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
                   >
                     {/* Image */}
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="relative h-40 sm:h-36 md:h-40 overflow-hidden shrink-0">
                       <HoverImageSlider images={pkg.images && pkg.images.length > 0 ? pkg.images : [pkg.image]} title={pkg.title} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 to-transparent pointer-events-none" />
-                      <span className={`absolute top-3 left-3 px-3 py-1 ${pkg.tagColor} text-white text-xs font-bold rounded-full font-tamil`}>
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent pointer-events-none" />
+                      <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 ${pkg.tagColor} text-white text-[11px] font-bold rounded-full font-tamil shadow-sm`}>
                         {pkg.categoryTag}
                       </span>
-                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full font-tamil">
-                          <Clock className="w-3 h-3" />
+                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-navy-950/60 backdrop-blur-md text-white text-[11px] font-semibold rounded-full font-tamil">
+                          <Clock className="w-3 h-3 text-gold-400" />
                           {pkg.duration}
                         </span>
                       </div>
                     </div>
 
                     {/* Content */}
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-tamil text-lg font-bold text-navy-950 mb-2 group-hover:text-navy-400 transition-colors">
+                    <div className="p-3.5 sm:p-4 flex flex-col flex-1">
+                      <h3 className="font-tamil text-sm sm:text-base font-bold text-navy-950 mb-1.5 leading-snug group-hover:text-gold-600 transition-colors line-clamp-2 min-h-[2.5rem]">
                         {pkg.title}
                       </h3>
-                      <p className="font-tamil text-navy-600/60 text-sm leading-relaxed mb-4">
+
+                      {pkg.placesToVisit && pkg.placesToVisit.length > 0 && (
+                        <div className="inline-flex items-center gap-1 text-[11px] text-navy-600 bg-navy-50/80 px-2 py-0.5 rounded-md mb-2 w-fit font-tamil font-medium">
+                          <MapPin className="w-3 h-3 text-gold-500 shrink-0" />
+                          <span>{pkg.placesToVisit.length} பார்க்கும் இடங்கள்</span>
+                        </div>
+                      )}
+
+                      <p className="font-tamil text-navy-600/70 text-xs leading-relaxed mb-3 line-clamp-2">
                         {pkg.shortDescription}
                       </p>
 
                       {/* Inclusions */}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {pkg.inclusions.slice(0, 4).map((inc) => {
-                          const Icon = inclusionIcons[inc] || Bus;
-                          return (
-                            <span
-                              key={inc}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 bg-navy-50 text-navy-600 text-xs font-medium rounded-lg font-tamil"
-                            >
-                              <Icon className="w-3 h-3" />
-                              {inc}
-                            </span>
-                          );
-                        })}
+                      <div className="flex flex-wrap items-center gap-1 mb-3 mt-auto">
+                        {pkg.inclusions.slice(0, 3).map((inc) => (
+                          <span
+                            key={inc}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-navy-50/70 text-navy-700 text-[11px] font-medium rounded-md font-tamil"
+                          >
+                            <span className="w-1 h-1 rounded-full bg-gold-500" />
+                            {inc}
+                          </span>
+                        ))}
+                        {pkg.inclusions.length > 3 && (
+                          <span className="px-1 text-[10px] text-navy-400 font-tamil self-center">
+                            +{pkg.inclusions.length - 3}
+                          </span>
+                        )}
                       </div>
 
                       {/* View Details Button */}
-                      <div className="mt-auto pt-4 border-t border-navy-100/50">
+                      <div className="pt-2.5 border-t border-navy-100/50">
                         <Link
                           to={`/package/${pkg.slug}`}
-                          className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm rounded-xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/20 hover:shadow-gold-500/30 hover:scale-[1.02] font-tamil"
+                          className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm rounded-xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-sm shadow-gold-500/20 hover:shadow-md hover:shadow-gold-500/30 hover:scale-[1.01] font-tamil"
                         >
                           விவரங்களை காண்க
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     </div>

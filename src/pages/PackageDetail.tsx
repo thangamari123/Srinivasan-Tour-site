@@ -17,21 +17,24 @@ export default function PackageDetail() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setActiveImageIndex(0);
   }, [slug]);
 
-  useEffect(() => {
-    if (!pkg) return;
-    const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
-    const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
+  const packageImages = pkg?.images && pkg.images.length > 0
+    ? pkg.images
+    : (slug && imagesByPackage[slug] ? imagesByPackage[slug] : (pkg ? [pkg.image] : []));
+  const displayImages = packageImages.length > 0 ? packageImages : ['/images/package1.webp'];
+  const activeImage = displayImages[activeImageIndex] || displayImages[0];
 
-    if (displayImages.length <= 1) return;
+  useEffect(() => {
+    if (!pkg || displayImages.length <= 1) return;
 
     const interval = setInterval(() => {
       setActiveImageIndex((prev) => (prev + 1) % displayImages.length);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [pkg, slug]);
+  }, [pkg, displayImages.length]);
 
   if (!pkg) {
     return (
@@ -50,10 +53,6 @@ export default function PackageDetail() {
       </div>
     );
   }
-
-  const packageImages = slug && imagesByPackage[slug] ? imagesByPackage[slug] : pkg.images;
-  const displayImages = packageImages && packageImages.length > 0 ? packageImages : [pkg.image];
-  const activeImage = displayImages[activeImageIndex];
 
   const relatedPackages = getPackagesByCategory(pkg.category).filter(p => p.slug !== pkg.slug).slice(0, 3);
 
@@ -115,6 +114,9 @@ export default function PackageDetail() {
                     src={activeImage}
                     alt={pkg.title}
                     className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = pkg.image || '/images/package1.webp';
+                    }}
                   />
                 </AnimatePresence>
 
@@ -126,7 +128,14 @@ export default function PackageDetail() {
                     onClick={() => setActiveImageIndex(idx)}
                     className={`w-24 h-20 sm:w-32 sm:h-24 rounded-2xl overflow-hidden shrink-0 border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#2E7D32] ring-2 ring-[#E8F5E9]' : 'border-transparent opacity-60 hover:opacity-100 hover:border-[#2E7D32]/50'}`}
                   >
-                    <img src={img} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = pkg.image || '/images/package1.webp';
+                      }}
+                    />
                   </button>
                 ))}
               </div>
@@ -157,47 +166,30 @@ export default function PackageDetail() {
               </div>
             </div>
 
-            {/* Overview */}
-            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold mb-4 font-tamil text-[#1E293B]">Overview</h2>
-              <p className="text-gray-600 leading-relaxed font-tamil text-lg">
-                {pkg.fullDescription}
-              </p>
-            </section>
-
-            {/* Highlights */}
-            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold mb-6 font-tamil text-[#1E293B]">சிறப்பம்சங்கள் (Highlights)</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {pkg.highlights.map(h => (
-                  <div key={h} className="flex items-start gap-3 bg-[#E8F5E9]/40 p-4 rounded-xl border border-[#2E7D32]/10 transition-colors hover:bg-[#E8F5E9]">
-                    <CheckCircle className="w-5 h-5 text-[#2E7D32] shrink-0 mt-0.5" />
-                    <span className="font-tamil text-[#1E293B] font-medium leading-relaxed">{h}</span>
+            {/* Places to Visit (பார்க்கும் இடங்கள்) */}
+            {pkg.placesToVisit && pkg.placesToVisit.length > 0 && (
+              <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-[#E8F5E9] flex items-center justify-center text-[#2E7D32]">
+                    <MapPin className="w-5 h-5" />
                   </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Itinerary */}
-            <section className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
-              <h2 className="text-2xl font-bold mb-8 font-tamil text-[#1E293B]">பயண அட்டவணை (Itinerary)</h2>
-              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.125rem] sm:before:ml-6 before:-translate-x-px before:h-full before:w-0.5 before:bg-gray-200">
-                {pkg.itinerary.map((item, index) => (
-                  <div key={index} className="relative flex gap-6 items-start">
-                    {/* Timeline Dot */}
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-full bg-white border-4 border-[#E8F5E9] shrink-0 flex items-center justify-center shadow-sm relative z-10 mt-1">
-                      <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-[#2E7D32]" />
-                    </div>
-                    {/* Content Card */}
-                    <div className="bg-gray-50/50 hover:bg-[#F8FAFC] p-5 sm:p-6 rounded-2xl border border-gray-100 w-full transition-all duration-300 hover:shadow-md hover:border-[#2E7D32]/20 group">
-                      <span className="inline-block px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] text-xs font-bold rounded-md font-tamil mb-3">{item.day}</span>
-                      <h3 className="font-tamil text-[#1E293B] font-bold text-lg mb-2 group-hover:text-[#2E7D32] transition-colors">{item.title}</h3>
-                      <p className="font-tamil text-gray-600 leading-relaxed text-sm sm:text-base">{item.description}</p>
-                    </div>
+                  <div>
+                    <h2 className="text-2xl font-bold font-tamil text-[#1E293B]">பார்க்கும் இடங்கள் (Places to Visit)</h2>
+                    <p className="text-gray-500 text-xs sm:text-sm font-tamil">இந்த சுற்றுலாவில் நீங்கள் காணக்கூடிய முக்கிய தலங்கள் & இடங்கள்</p>
                   </div>
-                ))}
-              </div>
-            </section>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                  {pkg.placesToVisit.map((place, idx) => (
+                    <div key={idx} className="flex items-start gap-3 bg-gradient-to-r from-[#E8F5E9]/50 to-emerald-50/30 p-3.5 sm:p-4 rounded-xl border border-[#2E7D32]/15 hover:border-[#2E7D32]/40 transition-colors">
+                      <div className="w-6 h-6 rounded-full bg-white shadow-xs flex items-center justify-center shrink-0 mt-0.5 text-[#2E7D32] font-bold text-xs">
+                        {idx + 1}
+                      </div>
+                      <span className="font-tamil text-[#1E293B] font-medium leading-relaxed text-sm sm:text-base">{place}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
           </div>
 
@@ -569,9 +561,13 @@ const imagesByPackage: Record<string, string[]> = {
   'rajasthan-palace-tour': ['/images/gen_rajasthan.webp', '/images/gallery2.webp', '/images/gallery1.webp', '/images/package3.webp'],
   'himachal-mountain-tour': ['/images/gen_himachal.webp', '/images/gallery4.webp', '/images/gallery5.webp', '/images/india-tour.webp'],
   'singapore-malaysia-tour': ['/images/gen_singapore.webp', '/images/package3.webp', '/images/package5.webp', '/images/international-tour.webp'],
+  'singapore-malaysia-6-days': ['/images/gen_singapore.webp', '/images/package3.webp', '/images/package5.webp', '/images/international-tour.webp'],
   'dubai-tour': ['/images/gen_dubai.webp', '/images/international-tour.webp', '/images/package4.webp', '/images/gallery2.webp'],
+  'dubai-tour-4-days': ['/images/gen_dubai.webp', '/images/international-tour.webp', '/images/package4.webp', '/images/gallery2.webp'],
   'maldives-tour': ['/images/gen_maldives.webp', '/images/package4.webp', '/images/gallery6.webp', '/images/gallery5.webp'],
   'bali-thailand-tour': ['/images/gen_bali.webp', '/images/package5.webp', '/images/gallery3.webp', '/images/international-tour.webp'],
+  'thailand-bangkok-pattaya-4-days': ['/images/package5.webp', '/images/gallery3.webp', '/images/international-tour.webp'],
+  'thailand-bangkok-pattaya-5-days': ['/images/package5.webp', '/images/gallery3.webp', '/images/international-tour.webp'],
 };
 
 function getThumbnail(reel: ReelData): string {

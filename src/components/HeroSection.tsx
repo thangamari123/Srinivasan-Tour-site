@@ -44,17 +44,17 @@ export default function HeroSection() {
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-navy-400/10 rounded-full blur-3xl z-1" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-14 sm:pb-24 w-full">
         <div className="max-w-3xl">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold-400/10 border border-gold-400/20 mb-8"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-400/10 border border-gold-400/20 mb-6 sm:mb-8"
           >
             <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
-            <span className="text-gold-400 text-sm font-medium font-tamil">15+ ஆண்டுகள் நம்பிக்கையான சேவை</span>
+            <span className="text-gold-400 text-xs sm:text-sm font-medium font-tamil">15+ ஆண்டுகள் நம்பிக்கையான சேவை</span>
           </motion.div>
 
           {/* Main Headline */}
@@ -62,7 +62,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-tamil text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6"
+            className="font-tamil text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 sm:mb-6"
           >
             உங்கள் கனவு பயணம்{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
@@ -76,7 +76,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="font-tamil text-lg sm:text-xl text-white/70 max-w-xl mb-10 leading-relaxed"
+            className="font-tamil text-base sm:text-lg md:text-xl text-white/80 max-w-xl mb-8 sm:mb-10 leading-relaxed"
           >
             இந்தியா & வெளிநாட்டு சுற்றுலா – முழுமையான வசதியுடன்
           </motion.p>
@@ -86,20 +86,20 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-wrap gap-4"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
           >
             <Link
               to="/packages"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-2xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-105 font-tamil"
+              className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm sm:text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
             >
               இப்போதே பதிவு செய்யுங்கள்
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a
               href="tel:+919384854560"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 font-tamil"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-sm sm:text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-[1.02] font-tamil"
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
               Call Now
             </a>
           </motion.div>
@@ -109,7 +109,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="flex flex-wrap gap-8 mt-14 pt-10 border-t border-white/10"
+            className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14 pt-8 sm:pt-10 border-t border-white/10"
           >
             {[
               { value: '15+', label: 'ஆண்டு அனுபவம்' },
@@ -117,9 +117,9 @@ export default function HeroSection() {
               { value: '200+', label: 'சுற்றுலா தொகுப்புகள்' },
               { value: '50+', label: 'இடங்கள்' },
             ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-2xl sm:text-3xl font-bold text-gold-400 font-heading">{stat.value}</p>
-                <p className="text-white/50 text-sm font-tamil mt-1">{stat.label}</p>
+              <div key={stat.label} className="bg-white/5 sm:bg-transparent p-3 sm:p-0 rounded-xl border border-white/5 sm:border-0 text-center sm:text-left">
+                <p className="text-xl sm:text-3xl font-bold text-gold-400 font-heading">{stat.value}</p>
+                <p className="text-white/60 text-xs sm:text-sm font-tamil mt-0.5">{stat.label}</p>
               </div>
             ))}
           </motion.div>

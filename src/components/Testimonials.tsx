@@ -66,17 +66,17 @@ export default function Testimonials() {
   const t = testimonials[current];
 
   return (
-    <section className="py-28 bg-white relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-white relative overflow-hidden">
       <div className="absolute inset-0 pattern-dots opacity-30" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-10 sm:mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 bg-navy-400/10 text-navy-400 text-sm font-semibold rounded-full font-tamil mb-4"
+            className="inline-block px-3.5 py-1 bg-navy-400/10 text-navy-600 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-3 sm:mb-4"
           >
             பயணிகள் கருத்துக்கள்
           </motion.div>
@@ -84,7 +84,7 @@ export default function Testimonials() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-tamil text-3xl sm:text-4xl lg:text-5xl font-bold text-navy-950 mb-4"
+            className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-navy-950 mb-3 sm:mb-4"
           >
             எங்கள் பயணிகள் சொல்வது
           </motion.h2>
@@ -93,7 +93,7 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-navy-600/60 text-lg max-w-2xl mx-auto font-tamil"
+            className="text-navy-600/70 text-sm sm:text-base max-w-2xl mx-auto font-tamil"
           >
             ஆயிரக்கணக்கான பயணிகளின் நம்பிக்கையும் மகிழ்ச்சியும்
           </motion.p>
@@ -102,65 +102,97 @@ export default function Testimonials() {
         {/* Slider Container */}
         <div className="relative max-w-3xl mx-auto">
           {/* Card */}
-          <div className="relative rounded-3xl bg-white shadow-2xl shadow-navy-950/8 border border-navy-100/40 overflow-hidden">
+          <div className="relative rounded-2xl sm:rounded-3xl bg-white shadow-xl sm:shadow-2xl shadow-navy-950/8 border border-navy-100/40 overflow-hidden">
             {/* Top accent bar */}
             <div className={`h-1.5 bg-gradient-to-r ${t.color}`} />
 
-            <div className="p-8 sm:p-10">
+            <div className="p-5 sm:p-8 md:p-10">
               {/* Quote + Tour badge row */}
-              <div className="flex items-start justify-between mb-6">
-                <span className={`inline-block px-3 py-1 bg-gradient-to-r ${t.color} text-white text-[11px] font-bold uppercase tracking-wider rounded-full font-heading`}>
+              <div className="flex items-start justify-between mb-4 sm:mb-6">
+                <span className={`inline-block px-2.5 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r ${t.color} text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-wider rounded-full font-heading`}>
                   {t.tour}
                 </span>
-                <Quote className="w-10 h-10 text-navy-100 shrink-0" />
+                <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-navy-100 shrink-0" />
               </div>
 
               {/* Stars */}
-              <div className="flex items-center gap-1 mb-5">
+              <div className="flex items-center gap-1 mb-4 sm:mb-5">
                 {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-gold-400 text-gold-400" />
+                  <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-gold-400 text-gold-400" />
                 ))}
               </div>
 
               {/* Review Text */}
-              <p className="font-tamil text-navy-800 text-base sm:text-lg leading-relaxed mb-8">
+              <p className="font-tamil text-navy-800 text-sm sm:text-base md:text-lg leading-relaxed mb-6 sm:mb-8">
                 "{t.text}"
               </p>
 
               {/* Divider */}
-              <div className="h-px bg-navy-100/60 mb-6" />
+              <div className="h-px bg-navy-100/60 mb-5 sm:mb-6" />
 
               {/* Author */}
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${t.color} flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-md`}>
                   {t.name.charAt(0)}
                 </div>
                 <div>
-                  <p className="font-tamil text-navy-950 font-bold text-base">{t.name}</p>
-                  <p className="font-tamil text-navy-500/60 text-sm">{t.location}</p>
+                  <p className="font-tamil text-navy-950 font-bold text-sm sm:text-base">{t.name}</p>
+                  <p className="font-tamil text-navy-500/70 text-xs sm:text-sm">{t.location}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Navigation Arrows */}
+          {/* Mobile navigation controls below card */}
+          <div className="flex sm:hidden items-center justify-between mt-4 px-2">
+            <button
+              onClick={prev}
+              className="p-2 rounded-xl bg-white shadow-md border border-navy-100/50 text-navy-600 active:scale-95"
+              aria-label="Previous review"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex items-center gap-1.5">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrent(index)}
+                  className={`rounded-full transition-all duration-300 ${
+                    index === current
+                      ? 'w-6 h-2.5 bg-navy-600'
+                      : 'w-2 h-2 bg-navy-200'
+                  }`}
+                  aria-label={`Go to review ${index + 1}`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={next}
+              className="p-2 rounded-xl bg-white shadow-md border border-navy-100/50 text-navy-600 active:scale-95"
+              aria-label="Next review"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Desktop Navigation Arrows */}
           <button
             onClick={prev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-7 w-11 h-11 rounded-2xl bg-white shadow-lg shadow-navy-950/10 border border-navy-100/50 flex items-center justify-center text-navy-400 hover:text-gold-500 hover:border-gold-400/30 hover:shadow-xl transition-all duration-300"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 lg:-translate-x-7 w-11 h-11 rounded-2xl bg-white shadow-lg shadow-navy-950/10 border border-navy-100/50 items-center justify-center text-navy-400 hover:text-gold-500 hover:border-gold-400/30 hover:shadow-xl transition-all duration-300"
             aria-label="Previous"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={next}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-7 w-11 h-11 rounded-2xl bg-white shadow-lg shadow-navy-950/10 border border-navy-100/50 flex items-center justify-center text-navy-400 hover:text-gold-500 hover:border-gold-400/30 hover:shadow-xl transition-all duration-300"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 lg:translate-x-7 w-11 h-11 rounded-2xl bg-white shadow-lg shadow-navy-950/10 border border-navy-100/50 items-center justify-center text-navy-400 hover:text-gold-500 hover:border-gold-400/30 hover:shadow-xl transition-all duration-300"
             aria-label="Next"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          {/* Dots */}
-          <div className="flex items-center justify-center gap-2.5 mt-8">
+          {/* Desktop Dots */}
+          <div className="hidden sm:flex items-center justify-center gap-2.5 mt-8">
             {testimonials.map((_, index) => (
               <button
                 key={index}
