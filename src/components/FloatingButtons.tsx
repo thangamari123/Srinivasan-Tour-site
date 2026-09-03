@@ -38,22 +38,26 @@ export default function FloatingButtons() {
         </a>
       </div>
 
-      {/* Mobile Sticky CTA Bar (Visible only on mobile) */}
-      <div className="sm:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-[400px] animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="bg-white/95 backdrop-blur-xl p-2 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex items-center gap-2 border border-gray-100">
+      {/* Mobile Sticky CTA Bar (Compact & small size, visible only on mobile) */}
+      <div className="sm:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[88%] max-w-[310px] animate-in fade-in slide-in-from-bottom-3 duration-300">
+        <div className="bg-white/95 backdrop-blur-xl p-1.5 rounded-full shadow-[0_10px_30px_-5px_rgba(0,0,0,0.25)] flex items-center gap-1.5 border border-gray-200/80">
           <a
             href="tel:+919384854560"
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-[#007AFF] text-white font-bold rounded-[1.5rem] shadow-lg shadow-blue-500/25 active:scale-95 transition-all"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-[#007AFF] text-white font-bold text-xs rounded-full shadow-md shadow-blue-500/25 active:scale-95 transition-all"
+            aria-label="Call Now"
           >
-            <Phone className="w-5 h-5 fill-current" />
-            <span className="text-sm tracking-tight">Call Now</span>
+            <Phone className="w-3.5 h-3.5 fill-current" />
+            <span className="tracking-tight">Call Now</span>
           </a>
           <a
-            href="https://wa.me/919384854560"
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-[#00C853] text-white font-bold rounded-[1.5rem] shadow-lg shadow-green-500/25 active:scale-95 transition-all"
+            href="https://wa.me/919384854560?text=வணக்கம்! சுற்றுலா பற்றிய தகவல் வேண்டும்"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 bg-[#25D366] text-white font-bold text-xs rounded-full shadow-md shadow-green-500/25 active:scale-95 transition-all"
+            aria-label="WhatsApp"
           >
-            <MessageCircle className="w-5 h-5 fill-current" />
-            <span className="text-sm tracking-tight">WhatsApp</span>
+            <MessageCircle className="w-3.5 h-3.5 fill-current" />
+            <span className="tracking-tight">WhatsApp</span>
           </a>
         </div>
       </div>
