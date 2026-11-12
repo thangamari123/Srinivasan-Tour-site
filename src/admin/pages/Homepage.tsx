@@ -180,8 +180,8 @@ export default function Homepage() {
         <Toggle checked={d.enabled} onChange={(v) => update('destinations', { enabled: v })} label="Show this section" description="Adds a “Popular Destinations” row on the homepage, below the featured packages." />
         <SectionHeadingFields value={d} onChange={(p) => update('destinations', p)} />
         <OrderedPicker
-          title="Destinations to show"
-          help="Leave empty to show all active destinations (up to 8)."
+          title="Destinations to show first (optional)"
+          help="All active destinations appear automatically. Leave empty for alphabetical order, or pick destinations here to pin them first."
           loading={destinations.loading}
           options={activeDestinations.map((x) => ({ id: x.id, label: x.name, image: x.image?.url }))}
           selected={d.destinationIds}

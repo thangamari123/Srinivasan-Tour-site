@@ -4,6 +4,9 @@ import { MapPin } from 'lucide-react';
 import { useSiteContent } from '../context/siteContentContext';
 import type { Destination } from '../types/content';
 
+const FALLBACK_DESTINATION_IMAGE =
+  'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package1.webp';
+
 /** Admin-managed "Popular Destinations" row. Hidden unless enabled in Homepage settings. */
 export default function PopularDestinations() {
   const { homepage, destinations, loading } = useSiteContent();
@@ -11,8 +14,12 @@ export default function PopularDestinations() {
   if (!section.enabled || loading) return null;
 
   const byId = new Map(destinations.map((d) => [d.id, d]));
+  // If specific destination IDs were picked in admin, prioritize them first,
+  // then include all remaining active destinations so newly added destinations appear automatically.
   const picked = (section.destinationIds ?? []).map((id) => byId.get(id)).filter(Boolean) as Destination[];
-  const list = (picked.length ? picked : destinations).filter((d) => d.image?.url).slice(0, 8);
+  const pickedIds = new Set(picked.map((d) => d.id));
+  const remaining = destinations.filter((d) => !pickedIds.has(d.id));
+  const list = [...picked, ...remaining];
   if (!list.length) return null;
 
   return (
@@ -28,26 +35,41 @@ export default function PopularDestinations() {
         </motion.div>
 
         <div className="flex flex-nowrap overflow-x-auto gap-2.5 -mx-4 px-4 pb-2 snap-x snap-proximity [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-webkit-overflow-scrolling:touch] md:mx-0 md:px-0 md:pb-0 md:overflow-visible md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-5">
-          {list.map((d) => (
-            <div key={d.id} className="flex-none w-[38vw] min-w-[132px] max-w-[170px] snap-start md:w-auto md:min-w-0 md:max-w-none">
-              <Link
-                to={`/packages?destination=${encodeURIComponent(d.slug)}`}
-                className="group relative block aspect-[4/5] rounded-xl md:rounded-2xl overflow-hidden shadow-md shadow-navy-950/10"
-              >
-                <img src={d.image!.url} alt={d.name} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/20 to-transparent" />
-                <div className="absolute bottom-0 inset-x-0 p-2.5 md:p-5">
-                  <h3 className="font-tamil text-white font-bold text-sm md:text-xl leading-tight line-clamp-2">{d.name}</h3>
-                  {(d.state || d.country) && (
-                    <p className="flex items-center gap-1 text-white/75 text-[11px] md:text-sm mt-0.5 md:mt-1 min-w-0">
-                      <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 shrink-0 text-gold-400" />
-                      <span className="truncate">{[d.state, d.country].filter(Boolean).join(', ')}</span>
-                    </p>
-                  )}
-                </div>
-              </Link>
-            </div>
-          ))}
+          {list.map((d) => {
+            const imageUrl = d.image?.url || FALLBACK_DESTINATION_IMAGE;
+            return (
+              <div key={d.id} className="flex-none w-[38vw] min-w-[132px] max-w-[170px] snap-start md:w-auto md:min-w-0 md:max-w-none">
+                <Link
+                  to={`/packages?destination=${encodeURIComponent(d.slug)}`}
+                  className="group relative block aspect-[4/5] rounded-xl md:rounded-2xl overflow-hidden shadow-md shadow-navy-950/10"
+                >
+                  <img
+                    src={imageUrl}
+                    alt={d.name}
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      if (el.src !== FALLBACK_DESTINATION_IMAGE) {
+                        el.src = FALLBACK_DESTINATION_IMAGE;
+                      }
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-950/20 to-transparent" />
+                  <div className="absolute bottom-0 inset-x-0 p-2.5 md:p-5">
+                    <h3 className="font-tamil text-white font-bold text-sm md:text-xl leading-tight line-clamp-2">{d.name}</h3>
+                    {(d.state || d.country) && (
+                      <p className="flex items-center gap-1 text-white/75 text-[11px] md:text-sm mt-0.5 md:mt-1 min-w-0">
+                        <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 shrink-0 text-gold-400" />
+                        <span className="truncate">{[d.state, d.country].filter(Boolean).join(', ')}</span>
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
