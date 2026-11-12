@@ -22,10 +22,14 @@ export default function TravelVideosEditor({
   value,
   onChange,
   defaultLocation = '',
+  duplicateMessage = 'This video is already added to the package',
+  emptyPreviewMessage = 'No videos to show yet — the Travel Reels section stays hidden on the website until you add and enable a video.',
 }: {
   value: TravelVideo[];
   onChange: (videos: TravelVideo[]) => void;
   defaultLocation?: string;
+  duplicateMessage?: string;
+  emptyPreviewMessage?: string;
 }) {
   const [formOpen, setFormOpen] = useState(value.length === 0);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
@@ -44,7 +48,7 @@ export default function TravelVideosEditor({
     : !draftId
       ? 'Not a valid YouTube link. Use youtube.com/shorts/…, youtu.be/… or youtube.com/watch?v=…'
       : duplicate
-        ? 'This video is already added to the package'
+        ? duplicateMessage
         : undefined;
   const titleError = touched && !draft.title.trim() ? 'Video title is required' : undefined;
   const full = value.length >= MAX_TRAVEL_VIDEOS;
@@ -274,7 +278,7 @@ export default function TravelVideosEditor({
         <p className="text-xs text-slate-500 mb-3">Exactly as shown on the website. Click a card to preview playback. Hidden videos are not shown.</p>
         {enabledVideos.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-200 px-4 py-8 text-center text-sm text-slate-500">
-            No videos to show yet — the Travel Reels section stays hidden on the website until you add and enable a video.
+            {emptyPreviewMessage}
           </div>
         ) : (
           <div className="rounded-xl bg-white border border-slate-200 p-4 sm:p-6" data-testid="reels-preview">

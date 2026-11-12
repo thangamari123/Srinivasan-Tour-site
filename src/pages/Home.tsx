@@ -13,8 +13,8 @@ export default function Home() {
       <HeroSection />
       {/* PromoBanners & PopularDestinations render nothing until enabled in the admin panel */}
       <PromoBanners />
-      <FeaturedPackages />
       <PopularDestinations />
+      <FeaturedPackages />
       <WhyChooseUs />
       {/* Renders only when active packages have enabled YouTube Shorts */}
       <HomeTravelReels />

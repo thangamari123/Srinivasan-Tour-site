@@ -11,6 +11,7 @@ import PackageForm from './pages/packages/PackageForm';
 import Destinations from './pages/Destinations';
 import Categories from './pages/Categories';
 import Homepage from './pages/Homepage';
+import TravelReels from './pages/TravelReels';
 import Testimonials from './pages/Testimonials';
 import MediaLibrary from './pages/MediaLibrary';
 import Settings from './pages/Settings';
@@ -33,6 +34,7 @@ export default function AdminShell({ AuthProvider }: { AuthProvider: ComponentTy
                   <Route path="destinations" element={<Destinations />} />
                   <Route path="categories" element={<Categories />} />
                   <Route path="homepage" element={<Homepage />} />
+                  <Route path="reels" element={<TravelReels />} />
                   <Route path="testimonials" element={<Testimonials />} />
                   <Route path="media" element={<MediaLibrary />} />
                   <Route path="settings" element={<Settings />} />

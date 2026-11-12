@@ -102,8 +102,8 @@ export default function PackageCard({ pkg, index = 0, reveal = false, useSlider 
         </div>
 
         {hasExplicitPrice && (
-          <div className="flex items-baseline gap-2 pt-1">
-            <span className="text-lg font-extrabold text-[var(--h-navy)]">{pkg.price}</span>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 pt-1">
+            <span className="text-base sm:text-lg font-extrabold text-[var(--h-navy)]">{pkg.price}</span>
             {pkg.originalPrice && (
               <span className="text-xs text-[var(--h-muted)] line-through">{pkg.originalPrice}</span>
             )}

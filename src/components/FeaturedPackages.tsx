@@ -13,7 +13,6 @@ export default function FeaturedPackages() {
   const section = homepage.featured;
   const [filter, setFilter] = useState('all');
   const sectionRef = useRef<HTMLElement>(null);
-  useReveal(sectionRef);
 
   // Manually curated list (in admin-defined order) or, if empty, packages flagged "featured".
   const packages = useMemo(() => {
@@ -29,6 +28,7 @@ export default function FeaturedPackages() {
     return [...seen].map(([key, label]) => ({ key, label }));
   }, [packages]);
   const visible = filter === 'all' ? packages : packages.filter((p) => p.category === filter);
+  useReveal(sectionRef, [], `${loading}-${filter}-${visible.map((p) => p.slug).join(',')}`);
 
   if (!section.enabled) return null;
   // Nothing to feature (and not loading/erroring): hide the section instead of showing an empty block.
@@ -43,12 +43,14 @@ export default function FeaturedPackages() {
     </Link>
   );
 
+  const badge = section.badge?.trim() === 'Popular Collections' ? 'Featured Destinations' : section.badge;
+
   return (
     <section ref={sectionRef} className="s-sec s-white font-tamil" aria-labelledby="featured-title">
       <div className="h-container">
         <div className="s-head rv">
           <div>
-            <span className="s-eyebrow">{section.badge}</span>
+            <span className="s-eyebrow">{badge}</span>
             <h2 id="featured-title" className="s-h2">{section.title}</h2>
             <p className="s-lead">{section.subtitle}</p>
           </div>
@@ -68,13 +70,13 @@ export default function FeaturedPackages() {
           </div>
         )}
 
-        {loading && <PackageGridSkeleton count={3} />}
+        {loading && <PackageGridSkeleton count={4} className="pk-home-grid" />}
         {error && !loading && <p className="pk-empty">{error}</p>}
 
         {!loading && !error && (
-          <div className="pk-grid s-rail">
+          <div className="pk-grid pk-home-grid">
             {visible.map((pkg, index) => (
-              <PackageCard key={pkg.slug} pkg={pkg} index={index} reveal />
+              <PackageCard key={pkg.slug} pkg={pkg} index={index} reveal={filter === 'all'} />
             ))}
           </div>
         )}

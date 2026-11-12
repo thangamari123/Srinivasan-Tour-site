@@ -117,7 +117,7 @@ service cloud.firestore {
     match /homepage/{section} {
       allow read: if true;
       allow create, update: if isStaff()
-        && section in ['hero', 'services', 'featured', 'destinations', 'banners', 'about', 'testimonials', 'cta'];
+        && section in ['hero', 'services', 'featured', 'destinations', 'banners', 'about', 'reels', 'testimonials', 'cta'];
       allow delete: if isAdmin();
     }
 

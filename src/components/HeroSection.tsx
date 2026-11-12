@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type TouchEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Globe, Phone, Send } from 'lucide-react';
 import { useSiteContent } from '../context/siteContentContext';
 import { defaultHomepage } from '../data/defaultContent';
@@ -26,17 +27,20 @@ function useCountUp(targets: number[], ref: React.RefObject<HTMLElement | null>)
 
   useEffect(() => {
     const final = key.split(',').map(Number);
-    if (prefersReducedMotion() || !ref.current) {
+    if (prefersReducedMotion() || !ref.current || typeof IntersectionObserver === 'undefined') {
       setValues(final);
       return;
     }
     let raf = 0;
     let timer = 0;
+    let started = false;
     const loadedAt = performance.now();
     const run = () => {
+      if (started) return;
+      started = true;
       const start = performance.now();
       const tick = (now: number) => {
-        const t = Math.min(1, (now - start) / 1600);
+        const t = Math.min(1, (now - start) / 1200);
         const eased = 1 - Math.pow(1 - t, 3);
         setValues(final.map((n) => Math.round(n * eased)));
         if (t < 1) raf = requestAnimationFrame(tick);
@@ -47,9 +51,9 @@ function useCountUp(targets: number[], ref: React.RefObject<HTMLElement | null>)
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
-        timer = window.setTimeout(run, Math.max(0, 1000 - (performance.now() - loadedAt)));
+        timer = window.setTimeout(run, Math.max(0, 300 - (performance.now() - loadedAt)));
       },
-      { threshold: 0.3 },
+      { threshold: 0.05 },
     );
     io.observe(ref.current);
     return () => {
@@ -77,11 +81,42 @@ export default function HeroSection() {
   const { homepage } = useSiteContent();
   const hero = homepage.hero;
 
-  const images = (hero.backgroundImages ?? []).map((i) => i.url).filter(Boolean);
-  const defaults = defaultHomepage.hero.backgroundImages.map((i) => i.url);
-  const mainPhoto = images[0] || defaults[0];
-  const secondPhoto = images[1] || FOREIGN_FALLBACK;
+  const slides = useMemo(() => {
+    const urls = (hero.backgroundImages ?? []).map((i) => i.url).filter(Boolean);
+    return urls.length > 0 ? urls : defaultHomepage.hero.backgroundImages.map((i) => i.url);
+  }, [hero.backgroundImages]);
+  const [slideState, setSlideState] = useState({ index: 0, dir: 1 });
+  const [slidePaused, setSlidePaused] = useState(false);
+  const slideTouchX = useRef<number | null>(null);
+  const slideCount = slides.length;
+  const slideIndex = slideCount ? ((slideState.index % slideCount) + slideCount) % slideCount : 0;
+  const mainPhoto = slides[slideIndex] || defaultHomepage.hero.backgroundImages[0].url;
+  const secondPhoto = slideCount > 1 ? slides[(slideIndex + 1) % slideCount] : FOREIGN_FALLBACK;
   const isDefaultTemple = mainPhoto === TEMPLE;
+
+  useEffect(() => {
+    if (slideCount <= 1 || slidePaused || prefersReducedMotion()) return;
+    const timer = window.setInterval(() => {
+      setSlideState((s) => ({ index: s.index + 1, dir: 1 }));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slideCount, slidePaused]);
+
+  const goSlide = (nextIndex: number, dir: number) => {
+    if (slideCount <= 1) return;
+    setSlideState({ index: ((nextIndex % slideCount) + slideCount) % slideCount, dir });
+  };
+  const onSlideTouchStart = (e: TouchEvent) => {
+    slideTouchX.current = e.touches[0].clientX;
+    setSlidePaused(true);
+  };
+  const onSlideTouchEnd = (e: TouchEvent) => {
+    setSlidePaused(false);
+    if (slideTouchX.current === null || slideCount <= 1) return;
+    const dx = e.changedTouches[0].clientX - slideTouchX.current;
+    slideTouchX.current = null;
+    if (Math.abs(dx) >= 36) goSlide(slideIndex + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  };
 
   const prefixWords = hero.headingPrefix.split(/\s+/).filter(Boolean);
   const suffixWords = hero.headingSuffix.split(/\s+/).filter(Boolean);
@@ -198,54 +233,123 @@ export default function HeroSection() {
             </a>
           </div>
 
-          <div ref={statsRef} className="h-stats h-up">
-            {hero.stats.map((stat, i) => {
-              const p = parsed[i];
-              const suffix = p?.suffix ?? '';
-              const plus = suffix.endsWith('+');
-              return (
-                <div key={stat.label} className="h-stat">
-                  <span className="h-stat-num">
-                    {p ? (
-                      <>
-                        {counts[i]}
-                        {plus ? suffix.slice(0, -1) : suffix}
-                        {plus && <span className="h-stat-plus">+</span>}
-                      </>
-                    ) : (
-                      stat.value
-                    )}
-                  </span>
-                  <span className="h-stat-label">{stat.label}</span>
-                </div>
-              );
-            })}
-          </div>
+          {hero.stats.length > 0 && (
+            <div
+              ref={statsRef}
+              className="h-stats h-up"
+              style={{ '--h-stat-cols': Math.min(Math.max(hero.stats.length, 1), 6) } as CSSProperties}
+            >
+              <div className={hero.stats.length > 1 ? 'h-stats-track' : 'h-stats-track h-stats-track-single'}>
+                {(hero.stats.length > 1 ? (['primary', 'clone'] as const) : (['primary'] as const)).map((pass) => (
+                  <div
+                    key={pass}
+                    className={pass === 'clone' ? 'h-stats-set h-stats-set-clone' : 'h-stats-set'}
+                    aria-hidden={pass === 'clone' || undefined}
+                  >
+                    {hero.stats.map((stat, i) => {
+                      const p = parsed[i];
+                      const suffix = p?.suffix ?? '';
+                      const plus = suffix.endsWith('+');
+                      return (
+                        <div key={`${pass}-${stat.label || i}`} className="h-stat">
+                          <span className="h-stat-num notranslate" translate="no">
+                            {p ? (
+                              <>
+                                <span>{counts[i] ?? p.target}</span>
+                                <span>{plus ? suffix.slice(0, -1) : suffix}</span>
+                                {plus && <span className="h-stat-plus">+</span>}
+                              </>
+                            ) : (
+                              stat.value
+                            )}
+                          </span>
+                          <span className="h-stat-label">{stat.label}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* ── Photo collage (decorative) ── */}
-        <div ref={collageRef} className="h-collage h-up" aria-hidden="true">
-          <div className="h-photo">
-            {isDefaultTemple ? (
-              <picture>
-                <source media="(max-width: 767px)" srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-landscape-640.webp 640w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp 940w" sizes="100vw" width={640} height={427} />
-                <img
-                  src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp"
-                  srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-360.webp 360w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp 487w"
-                  sizes="420px"
-                  width={487}
-                  height={627}
-                  alt=""
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              </picture>
-            ) : (
-              <img src={mainPhoto} alt="" width={420} height={540} fetchPriority="high" decoding="async" />
+        {/* ── Photo collage (slideshow + decorative frame) ── */}
+        <div ref={collageRef} className="h-collage h-up">
+          <div
+            className="h-photo"
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Hero slideshow"
+            onPointerEnter={(e) => {
+              if (e.pointerType === 'mouse') setSlidePaused(true);
+            }}
+            onPointerLeave={(e) => {
+              if (e.pointerType === 'mouse') setSlidePaused(false);
+            }}
+            onTouchStart={onSlideTouchStart}
+            onTouchEnd={onSlideTouchEnd}
+            onTouchCancel={() => setSlidePaused(false)}
+          >
+            <AnimatePresence initial={false} custom={slideState.dir}>
+              <motion.div
+                key={`${slideIndex}-${mainPhoto}`}
+                custom={slideState.dir}
+                variants={{
+                  enter: (dir: number) => ({ x: dir >= 0 ? '100%' : '-100%' }),
+                  center: { x: '0%' },
+                  exit: (dir: number) => ({ x: dir >= 0 ? '-100%' : '100%' }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: prefersReducedMotion() ? 0 : 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="h-photo-slide"
+              >
+                {isDefaultTemple ? (
+                  <picture>
+                    <source media="(max-width: 767px)" srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-landscape-640.webp 640w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp 940w" sizes="100vw" width={640} height={427} />
+                    <img
+                      src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp"
+                      srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-360.webp 360w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp 487w"
+                      sizes="420px"
+                      width={487}
+                      height={627}
+                      alt=""
+                      fetchPriority={slideIndex === 0 ? 'high' : 'auto'}
+                      decoding="async"
+                    />
+                  </picture>
+                ) : (
+                  <img
+                    src={mainPhoto}
+                    alt=""
+                    width={420}
+                    height={540}
+                    fetchPriority={slideIndex === 0 ? 'high' : 'auto'}
+                    decoding="async"
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {slideCount > 1 && (
+              <div className="h-photo-dots" role="group" aria-label="Slide controls">
+                {slides.map((url, i) => (
+                  <button
+                    key={`${url}-${i}`}
+                    type="button"
+                    className="h-photo-dot"
+                    aria-label={`Show slide ${i + 1}`}
+                    aria-current={i === slideIndex ? 'true' : undefined}
+                    onClick={() => goSlide(i, i >= slideIndex ? 1 : -1)}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
-          <div className="h-photo2">
+          <div className="h-photo2" aria-hidden="true">
             <img
               src={secondPhoto === FOREIGN_FALLBACK ? 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-foreign-500.webp' : secondPhoto}
               alt=""
@@ -256,7 +360,7 @@ export default function HeroSection() {
             />
           </div>
 
-          <div className="h-spin">
+          <div className="h-spin" aria-hidden="true">
             <svg className="h-spin-ring" viewBox="0 0 140 140">
               <defs>
                 <path id="h-ring-path" d="M70 70 m -52 0 a 52 52 0 1 1 104 0 a 52 52 0 1 1 -104 0" />
@@ -284,7 +388,7 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <div className="h-flight">
+          <div className="h-flight" aria-hidden="true">
             <svg width="560" height="420" viewBox="0 0 560 420" fill="none">
               <path d={FLIGHT_PATH} stroke="#D99A0B" strokeWidth="1.8" strokeLinecap="round" />
             </svg>

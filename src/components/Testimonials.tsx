@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type TouchEvent } from 'react';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { useSiteContent } from '../context/siteContentContext';
 import { useReveal } from '../hooks/useReveal';
@@ -15,6 +15,7 @@ export default function Testimonials() {
   const total = testimonials.length;
   const current = total ? rawCurrent % total : 0;
   const sectionRef = useRef<HTMLElement>(null);
+  const touchX = useRef<number | null>(null);
   useReveal(sectionRef);
 
   const goTo = useCallback(
@@ -27,6 +28,15 @@ export default function Testimonials() {
   );
   const next = useCallback(() => goTo(current + 1), [goTo, current]);
   const prev = useCallback(() => goTo(current - 1), [goTo, current]);
+  const onTouchStart = (e: TouchEvent) => {
+    touchX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    if (touchX.current === null || total < 2) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) >= 40) goTo(current + (dx < 0 ? 1 : -1));
+  };
 
   // Autoplay every 6s; paused on hover / keyboard focus; off for reduced motion.
   useEffect(() => {
@@ -67,9 +77,9 @@ export default function Testimonials() {
   );
 
   return (
-    <section ref={sectionRef} className="s-sec s-white font-tamil" aria-labelledby="reviews-title">
+    <section ref={sectionRef} className="s-sec s-white ts-sec font-tamil" aria-labelledby="reviews-title">
       <div className="h-container ts-grid">
-        <div className="rv">
+        <div className="rv ts-intro">
           <span className="s-eyebrow s-eyebrow-grey">{section.badge}</span>
           <h2 id="reviews-title" className="s-h2">{section.title}</h2>
           <p className="s-lead">{section.subtitle}</p>
@@ -77,13 +87,13 @@ export default function Testimonials() {
         </div>
 
         <div
-          className="rv"
+          className="rv ts-stage"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setPaused(true)}
           onBlur={() => setPaused(false)}
         >
-          <div className="ts-stack">
+          <div className="ts-stack" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <span className="ts-back ts-back-1" aria-hidden="true" />
             <span className="ts-back ts-back-2" aria-hidden="true" />
             <figure className={`ts-card ${flip ? 'ts-anim-b' : 'ts-anim-a'}`} aria-live="polite">

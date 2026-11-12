@@ -112,13 +112,17 @@ export default function Preloader() {
     <div
       role="status"
       aria-label="Loading"
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center px-6 transition-opacity ease-out ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center px-5 pb-14 pt-6 sm:px-6 sm:py-8 transition-opacity ease-out ${
         fading ? 'opacity-0' : 'opacity-100'
       }`}
       style={{ transitionDuration: `${FADE_MS}ms`, background: BG }}
     >
-      {/* Logo animation — sized to the viewport so it works from small phones to large desktops */}
-      <div className="relative w-[min(78vw,50vh,420px)] aspect-[648/720]" style={EDGE_MASK} aria-hidden="true">
+      {/* Logo animation — compact on mobile, scales cleanly up to desktop */}
+      <div
+        className="relative w-[min(56vw,34dvh,220px)] sm:w-[min(60vw,42dvh,320px)] md:w-[min(48vw,46dvh,380px)] aspect-[648/720] shrink-0"
+        style={EDGE_MASK}
+        aria-hidden="true"
+      >
         {mode === 'video' ? (
           <video
             ref={videoRef}
@@ -147,24 +151,26 @@ export default function Preloader() {
       </div>
 
       {/* Brand + progress */}
-      <div className="mt-[clamp(8px,2.5vh,28px)] flex flex-col items-center w-full max-w-[280px]">
-        <p className="font-tamil font-bold text-[#0F1E3A] text-xl sm:text-2xl tracking-wide text-center">ஸ்ரீநிவாசா</p>
-        <p className="font-tamil text-[#8A5A06] text-xs sm:text-sm tracking-[0.25em] uppercase font-semibold mt-0.5 text-center">
+      <div className="mt-2.5 sm:mt-[clamp(10px,2.2vh,24px)] flex flex-col items-center w-full max-w-[205px] sm:max-w-[260px]">
+        <p className="font-tamil font-bold text-[#0F1E3A] text-lg sm:text-2xl tracking-wide text-center leading-tight">ஸ்ரீநிவாசா</p>
+        <p className="font-tamil text-[#8A5A06] text-[11px] sm:text-sm tracking-[0.2em] sm:tracking-[0.25em] uppercase font-semibold mt-0.5 text-center">
           Tour Operators
         </p>
-        <div className="w-full h-[3px] mt-5 rounded-full bg-[#0F1E3A]/10 overflow-hidden">
+        <div className="w-full h-[2.5px] sm:h-[3px] mt-3 sm:mt-4 rounded-full bg-[#0F1E3A]/10 overflow-hidden">
           <div
             className="h-full rounded-full bg-gradient-to-r from-[#F0B429] to-[#D99A0B] transition-[width] duration-300 ease-out"
             style={{ width: `${Math.round((mode === 'still' ? 1 : progress) * 100)}%` }}
           />
         </div>
-        <p className="mt-3 text-[#5B6478] text-[11px] tracking-[0.2em] uppercase">Your Journey Begins...</p>
+        <p className="mt-2 sm:mt-2.5 text-[#5B6478] text-[10px] sm:text-[11px] tracking-[0.16em] sm:tracking-[0.2em] uppercase text-center">
+          Your Journey Begins...
+        </p>
       </div>
 
       <button
         type="button"
         onClick={finish}
-        className="absolute bottom-[max(20px,env(safe-area-inset-bottom))] right-5 min-h-[44px] px-5 rounded-full text-sm font-semibold text-[#0F1E3A] bg-white/80 border border-[#E3DFD5] hover:bg-white transition-colors"
+        className="absolute bottom-[max(16px,env(safe-area-inset-bottom))] right-4 sm:bottom-[max(20px,env(safe-area-inset-bottom))] sm:right-6 min-h-[38px] sm:min-h-[42px] px-4 sm:px-5 rounded-full text-xs sm:text-sm font-semibold text-[#0F1E3A] bg-white/85 border border-[#E3DFD5] hover:bg-white transition-colors"
       >
         Skip
       </button>

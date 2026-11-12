@@ -39,7 +39,7 @@ export const defaultHomepage: HomepageContent = {
   },
   featured: {
     enabled: true,
-    badge: 'Popular Collections',
+    badge: 'Featured Destinations',
     title: 'Best Travel Packages',
     subtitle: 'யாத்திரை, இந்திய சுற்றுலா, வெளிநாட்டு சுற்றுலா – உங்கள் விருப்பத்தை தேர்வு செய்யுங்கள்',
     packageIds: [],
@@ -71,6 +71,13 @@ export const defaultHomepage: HomepageContent = {
     badge: 'பயணிகள் கருத்துக்கள்',
     title: 'எங்கள் பயணிகள் சொல்வது',
     subtitle: 'ஆயிரக்கணக்கான பயணிகளின் நம்பிக்கையும் மகிழ்ச்சியும்',
+  },
+  reels: {
+    enabled: true,
+    badge: 'Travel Reels',
+    title: 'எங்கள் பயணங்கள் சொல்வது',
+    subtitle: 'பயணிகளின் நிஜமான அனுபவங்களை வீடியோவில் காணுங்கள்',
+    videos: [],
   },
   cta: {
     badge: 'இப்போதே தொடங்குங்கள்',

@@ -20,7 +20,7 @@ export default function WhyChooseUs() {
   const count = about.reasons.length;
 
   return (
-    <section ref={sectionRef} className="s-sec s-navy font-tamil" aria-labelledby="highlights-title">
+    <section ref={sectionRef} className="s-sec s-navy hl-sec font-tamil" aria-labelledby="highlights-title">
       <div className="h-container">
         <div className="s-head s-head-center rv">
           <span className="s-eyebrow">{about.badge}</span>

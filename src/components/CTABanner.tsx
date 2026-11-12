@@ -24,7 +24,7 @@ export default function CTABanner() {
   );
 
   return (
-    <section className="s-sec s-ivory font-tamil" aria-labelledby="cta-title">
+    <section className="s-sec s-ivory bp-sec font-tamil" aria-labelledby="cta-title">
       <div className="h-container">
         <div ref={passRef} className="bp rv">
           <div className="bp-main">

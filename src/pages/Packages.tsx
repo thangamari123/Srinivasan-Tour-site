@@ -291,7 +291,7 @@ export default function Packages() {
 
           {/* Packages Grid */}
           {loading ? (
-            <PackageGridSkeleton count={6} />
+            <PackageGridSkeleton count={6} className="pk-packages-grid" />
           ) : error ? (
             <div className="rounded-3xl bg-white border border-[var(--s-line)] p-10 text-center max-w-xl mx-auto">
               <h3 className="text-xl font-bold text-[var(--h-navy)] mb-2">{error}</h3>
@@ -304,7 +304,7 @@ export default function Packages() {
               </button>
             </div>
           ) : currentPackages.length > 0 ? (
-            <div className="pk-grid">
+            <div className="pk-grid pk-packages-grid">
               {currentPackages.map((pkg, index) => (
                 <PackageCard key={pkg.id || pkg.slug} pkg={pkg} index={index} useSlider />
               ))}

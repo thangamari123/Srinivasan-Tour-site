@@ -234,7 +234,7 @@ export function GalleryField({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
         <p className="text-sm font-medium text-slate-700">
           {label} <span className="text-slate-400 font-normal">({value.length}/{max})</span>
         </p>

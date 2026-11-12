@@ -7,6 +7,8 @@ import { useActor } from '../hooks/useUploader';
 import { useConfirm, useToast } from '../context/feedback';
 import { errorMessage, saveHomepageSection } from '../services/content';
 import { GalleryField, ImageField } from '../components/ImageFields';
+import ReelsSectionFields from '../components/ReelsSectionFields';
+import { countActivePackageReels, sanitizeTravelVideos } from '../services/travelVideos';
 import { Button, Card, CardHeader, ErrorBanner, IconButton, PageHeader, Skeleton, TextArea, TextInput, Toggle, cx } from '../ui';
 import { defaultHomepage } from '../../data/defaultContent';
 import type { Destination, HomepageContent, HomepageSectionKey, PromoBanner, TourPackage } from '../../types/content';
@@ -19,6 +21,7 @@ const TABS: { key: HomepageSectionKey; label: string }[] = [
   { key: 'destinations', label: 'Popular destinations' },
   { key: 'banners', label: 'Promo banners' },
   { key: 'about', label: 'About / Why us' },
+  { key: 'reels', label: 'Travel reels' },
   { key: 'testimonials', label: 'Testimonials heading' },
   { key: 'cta', label: 'Call to action' },
 ];
@@ -44,6 +47,9 @@ function normalizeSection<K extends HomepageSectionKey>(key: K, raw: Record<stri
     if (Array.isArray(defVal) && !Array.isArray(out[field])) {
       out[field] = defVal;
     }
+  }
+  if (key === 'featured' && typeof out.badge === 'string' && out.badge.trim() === 'Popular Collections') {
+    out.badge = 'Featured Destinations';
   }
   return merged as HomepageContent[K];
 }
@@ -78,7 +84,12 @@ export default function Homepage() {
     if (saving) return;
     setSaving(true);
     try {
-      await saveHomepageSection(tab, stripMeta(value(tab)) as unknown as Record<string, unknown>, actor);
+      const clean = stripMeta(value(tab));
+      const payload =
+        tab === 'reels'
+          ? { ...(clean as HomepageContent['reels']), videos: sanitizeTravelVideos((clean as HomepageContent['reels']).videos) }
+          : clean;
+      await saveHomepageSection(tab, payload as unknown as Record<string, unknown>, actor);
       setDrafts((d) => {
         const next = { ...d };
         delete next[tab];
@@ -236,6 +247,14 @@ export default function Homepage() {
           )}
         </div>
       </div>
+    );
+  } else if (tab === 'reels') {
+    editor = (
+      <ReelsSectionFields
+        value={value('reels')}
+        onChange={(p) => update('reels', p)}
+        packageReelsCount={countActivePackageReels(packages.data)}
+      />
     );
   } else if (tab === 'testimonials') {
     editor = (

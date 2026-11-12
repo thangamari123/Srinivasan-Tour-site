@@ -2,6 +2,7 @@ import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   ExternalLink,
+  Film,
   FolderTree,
   Home,
   Images,
@@ -11,7 +12,6 @@ import {
   Menu,
   MessageSquareQuote,
   Package,
-  Plane,
   Settings,
   WifiOff,
   X,
@@ -41,6 +41,7 @@ const NAV = [
   { to: '/admin/destinations', label: 'Destinations', icon: MapPin },
   { to: '/admin/categories', label: 'Categories', icon: FolderTree },
   { to: '/admin/homepage', label: 'Homepage', icon: Home },
+  { to: '/admin/reels', label: 'Travel Reels', icon: Film },
   { to: '/admin/testimonials', label: 'Testimonials', icon: MessageSquareQuote },
   { to: '/admin/media', label: 'Media Library', icon: Images },
   { to: '/admin/settings', label: 'Settings', icon: Settings },
@@ -59,8 +60,14 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <Link to="/admin" onClick={onNavigate} className="flex items-center gap-3 px-5 h-16 border-b border-white/10 shrink-0">
-        <div className="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-          <Plane className="w-4.5 h-4.5 text-white" />
+        <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0 bg-white shadow-lg shadow-slate-950/30">
+          <img
+            src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/logo/logo.webp"
+            alt="Srinivasa Tours"
+            width={36}
+            height={36}
+            className="w-full h-full object-cover"
+          />
         </div>
         <div className="leading-tight">
           <p className="text-sm font-semibold text-white">Srinivasa Tours</p>

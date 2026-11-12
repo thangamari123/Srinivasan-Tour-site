@@ -4,21 +4,23 @@ import { ReelPlayer, type ReelVideo } from './TravelReels';
 import { useSiteContent } from '../context/siteContentContext';
 import { useReveal } from '../hooks/useReveal';
 import { isValidVideoId, youTubeThumbnail } from '../lib/youtube';
+import { publicTravelVideos } from '../lib/packageView';
 import '../styles/home.css';
 
-const MAX_HOME_REELS = 8;
+const MAX_HOME_REELS = 12;
 
 /** transform / z-index / opacity / filter for a reel at distance d from the active one. */
 function coverflowStyle(d: number): CSSProperties {
   const a = Math.abs(d);
   const rotate = d === 0 ? 0 : d > 0 ? -34 : 34;
   return {
-    transform: `translateX(-50%) translateX(${d * 62}%) rotateY(${rotate}deg) scale(${1 - Math.min(a, 2) * 0.14})`,
+    '--cf-d': d,
+    transform: `translateX(-50%) translateX(calc(var(--cf-d) * var(--cf-step, 62%))) rotateY(${rotate}deg) scale(${1 - Math.min(a, 2) * 0.14})`,
     zIndex: 10 - a,
     opacity: a === 0 ? 1 : a === 1 ? 0.9 : a === 2 ? 0.55 : 0,
     filter: `brightness(${a === 0 ? 1 : 0.7})`,
     pointerEvents: a > 2 ? 'none' : undefined,
-  };
+  } as CSSProperties;
 }
 
 /**
@@ -27,25 +29,28 @@ function coverflowStyle(d: number): CSSProperties {
  * Hidden when there are none.
  */
 export default function HomeTravelReels() {
-  const { packages, loading } = useSiteContent();
+  const { packages, homepage, loading } = useSiteContent();
+  const section = homepage.reels;
   const sectionRef = useRef<HTMLElement>(null);
   useReveal(sectionRef);
 
   const seen = new Set<string>();
   const videos: ReelVideo[] = [];
+  const pushUnique = (v: ReelVideo) => {
+    if (videos.length >= MAX_HOME_REELS || seen.has(v.videoId) || !isValidVideoId(v.videoId)) return;
+    seen.add(v.videoId);
+    videos.push(v);
+  };
+  for (const v of publicTravelVideos(section.videos)) pushUnique(v);
   for (const pkg of packages) {
-    for (const v of pkg.travelVideos) {
-      if (videos.length >= MAX_HOME_REELS || seen.has(v.videoId) || !isValidVideoId(v.videoId)) continue;
-      seen.add(v.videoId);
-      videos.push(v);
-    }
+    for (const v of pkg.travelVideos) pushUnique(v);
   }
 
   const [active, setActive] = useState<number | null>(null);
   const [playing, setPlaying] = useState<number | null>(null);
   const touchX = useRef<number | null>(null);
 
-  if (loading || videos.length === 0) return null;
+  if (!section.enabled || loading || videos.length === 0) return null;
 
   const current = active ?? Math.floor((videos.length - 1) / 2); // start with the middle reel
   const go = (i: number) => setActive((i + videos.length) % videos.length);
@@ -67,10 +72,10 @@ export default function HomeTravelReels() {
       <div className="h-container">
         <div className="s-head s-head-center rv">
           <span className="s-eyebrow s-eyebrow-red">
-            <Play className="w-3 h-3 fill-[#E11D48] text-[#E11D48]" aria-hidden="true" /> Travel Reels
+            <Play className="w-3 h-3 fill-[#E11D48] text-[#E11D48]" aria-hidden="true" /> {section.badge}
           </span>
-          <h2 id="reels-title" className="s-h2">எங்கள் பயணங்கள் சொல்வது</h2>
-          <p className="s-lead">பயணிகளின் நிஜமான அனுபவங்களை வீடியோவில் காணுங்கள்</p>
+          <h2 id="reels-title" className="s-h2">{section.title}</h2>
+          <p className="s-lead">{section.subtitle}</p>
         </div>
 
         <div

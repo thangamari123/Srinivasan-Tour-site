@@ -229,12 +229,21 @@ export interface TestimonialsSectionContent {
   subtitle: string;
 }
 
+export interface ReelsSectionContent {
+  enabled: boolean;
+  badge: string;
+  title: string;
+  subtitle: string;
+  videos: TravelVideo[];
+}
+
 export interface HomepageContent {
   hero: HeroContent;
   featured: FeaturedSectionContent;
   destinations: DestinationsSectionContent;
   banners: BannersSectionContent;
   about: AboutSectionContent;
+  reels: ReelsSectionContent;
   testimonials: TestimonialsSectionContent;
   cta: CtaSectionContent;
 }

@@ -65,30 +65,32 @@ export default function Footer() {
         <div className="ft-grid">
           {/* Brand */}
           <div className="ft-brand-col">
-            <Link to="/" className="ft-brand">
-              <span className="ft-tile">
-                <img src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/logo/logo.webp" alt="ஸ்ரீநிவாசா Tour Operators" width={46} height={46} loading="lazy" />
-              </span>
-              <span>
-                <span className="ft-name block">ஸ்ரீநிவாசா</span>
-                <span className="ft-sub block">Tour Operators</span>
-              </span>
-            </Link>
+            <div className="ft-brand-head">
+              <Link to="/" className="ft-brand">
+                <span className="ft-tile">
+                  <img src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/logo/logo.webp" alt="ஸ்ரீநிவாசா Tour Operators" width={46} height={46} loading="lazy" />
+                </span>
+                <span>
+                  <span className="ft-name block">ஸ்ரீநிவாசா</span>
+                  <span className="ft-sub block">Tour Operators</span>
+                </span>
+              </Link>
+              <div className="ft-social">
+                {socials.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+                    <s.icon className="w-[18px] h-[18px]" aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            </div>
             <p className="ft-about">
               15+ ஆண்டுகள் அனுபவம் கொண்ட நம்பிக்கையான சுற்றுலா நிறுவனம். உங்கள் கனவு பயணத்தை நாங்கள் நிஜமாக்குகிறோம்.
             </p>
-            <div className="ft-social">
-              {socials.map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
-                  <s.icon className="w-[18px] h-[18px]" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Quick links */}
           <LinkColumn title="விரைவு இணைப்புகள்" mobile={mobile}>
-            <ul className="ft-list">
+            <ul className="ft-list ft-list-quick">
               {quickLinks.map((link) => (
                 <li key={link.path}>
                   <Link to={link.path}>{link.name}</Link>
@@ -119,8 +121,8 @@ export default function Footer() {
                 <div>
                   <p className="ft-label">Head Office</p>
                   <p className="ft-addr">
-                    19/34, Venkataraman Street,
-                    <br />
+                    19/34, Venkataraman Street,{' '}
+                    <br className="hidden md:inline" />
                     Perambur, Chennai - 600 011.
                   </p>
                   <p className="ft-addr-note">(Opp. Railway Station & Bus Stand)</p>
@@ -133,10 +135,10 @@ export default function Footer() {
                 <div>
                   <p className="ft-label">Branch</p>
                   <p className="ft-addr">
-                    No. 10, 1st Cross Street,
-                    <br />
-                    Kalyan Nagar, West Tambaram,
-                    <br />
+                    No. 10, 1st Cross Street,{' '}
+                    <br className="hidden md:inline" />
+                    Kalyan Nagar, West Tambaram,{' '}
+                    <br className="hidden md:inline" />
                     Chennai - 600 045.
                   </p>
                 </div>
