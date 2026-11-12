@@ -1,88 +1,71 @@
-import { motion } from 'framer-motion';
-import { Award, ShieldCheck, Sparkles, HeartHandshake } from 'lucide-react';
+import { useRef } from 'react';
+import { Award, ShieldCheck, Sparkles, HeartHandshake, MapPin, Plane } from 'lucide-react';
+import { useSiteContent } from '../context/siteContentContext';
+import { useReveal, stagger } from '../hooks/useReveal';
+import '../styles/home.css';
 
-const reasons = [
-  {
-    icon: Award,
-    title: 'அனுபவம்',
-    description: '15+ ஆண்டுகள் சுற்றுலா துறையில் சேவை. ஒவ்வொரு பயணத்திலும் நாங்கள் உங்கள் நம்பிக்கையான துணை.',
-    gradient: 'from-amber-400 to-orange-500',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'பாதுகாப்பு',
-    description: 'பாதுகாப்பான பயணமே சிறந்த பயணம். முழு கவனிப்புடன் உங்கள் பாதுகாப்பை உறுதி செய்கிறோம்.',
-    gradient: 'from-emerald-400 to-teal-500',
-  },
-  {
-    icon: Sparkles,
-    title: 'முழு வசதி',
-    description: 'போக்குவரத்து, தங்குமிடம், உணவு – அனைத்தும் ஒரே தொகுப்பில். நீங்கள் பயணம் மட்டும் அனுபவியுங்கள்.',
-    gradient: 'from-blue-400 to-indigo-500',
-  },
-  {
-    icon: HeartHandshake,
-    title: 'நம்பிக்கை',
-    description: 'ஆயிரக்கணக்கான மகிழ்ச்சியான பயணிகள். ISO சான்றிதழ் பெற்ற நிறுவனம்.',
-    gradient: 'from-rose-400 to-pink-500',
-  },
+// Icons and colours cycle by position; text comes from the CMS (Homepage → About / Why us).
+const reasonStyles = [
+  { icon: Award, bg: 'linear-gradient(135deg,#FB923C,#EA580C)', glow: 'rgba(234,88,12,.45)' },
+  { icon: ShieldCheck, bg: 'linear-gradient(135deg,#34D399,#059669)', glow: 'rgba(5,150,105,.45)' },
+  { icon: Sparkles, bg: 'linear-gradient(135deg,#818CF8,#4F46E5)', glow: 'rgba(79,70,229,.45)' },
+  { icon: HeartHandshake, bg: 'linear-gradient(135deg,#F472B6,#DB2777)', glow: 'rgba(219,39,119,.45)' },
 ];
 
 export default function WhyChooseUs() {
-  return (
-    <section className="py-16 sm:py-24 bg-navy-950 relative overflow-hidden">
-      {/* Decorative */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gold-400/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-navy-400/5 rounded-full blur-3xl" />
+  const { homepage } = useSiteContent();
+  const about = homepage.about;
+  const sectionRef = useRef<HTMLElement>(null);
+  useReveal(sectionRef);
+  const count = about.reasons.length;
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-10 sm:mb-16">
-          <motion.span
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="inline-block px-3.5 py-1 bg-gold-400/10 text-gold-400 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-3 sm:mb-4"
-          >
-            ஏன் எங்களை தேர்வு செய்ய வேண்டும்?
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4"
-          >
-            எங்கள் சிறப்பம்சங்கள்
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-white/60 text-sm sm:text-base max-w-2xl mx-auto font-tamil"
-          >
-            உங்கள் பயணத்தை மேம்படுத்தும் நான்கு காரணங்கள்
-          </motion.p>
+  return (
+    <section ref={sectionRef} className="s-sec s-navy font-tamil" aria-labelledby="highlights-title">
+      <div className="h-container">
+        <div className="s-head s-head-center rv">
+          <span className="s-eyebrow">{about.badge}</span>
+          <h2 id="highlights-title" className="s-h2">{about.title}</h2>
+          <p className="s-lead">{about.subtitle}</p>
         </div>
 
-        {/* Reasons Grid - 2 columns on mobile, 4 on desktop */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
-          {reasons.map((reason, index) => (
-            <motion.div
-              key={reason.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.08 }}
-              className="group text-center p-3.5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 hover:border-gold-400/20 transition-all duration-300 flex flex-col items-center justify-start h-full"
-            >
-              <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${reason.gradient} shadow-md mb-2.5 sm:mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                <reason.icon className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
+        {/* Flight route over the cards (desktop/tablet) */}
+        {count > 0 && (
+          <div className="hl-route" aria-hidden="true">
+            <svg className="hl-line" viewBox="0 0 1000 56" preserveAspectRatio="none">
+              <path
+                d="M0 28 C 120 4, 250 52, 375 28 S 625 4, 750 28 S 900 52, 1000 28"
+                fill="none"
+                stroke="rgba(240,180,41,.55)"
+                strokeWidth="1.6"
+                strokeDasharray="6 8"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+            {about.reasons.slice(0, 4).map((_, i) => (
+              <span key={i} className="hl-pin" style={{ left: `${(100 / Math.min(count, 4)) * (i + 0.5)}%`, animationDelay: `${i * 0.4}s` }}>
+                <MapPin className="w-6 h-6 fill-[#F0B429] text-[#F0B429] [&>circle]:fill-[#0F1E3A] [&>circle]:stroke-[#0F1E3A]" />
+              </span>
+            ))}
+            <span className="hl-plane">
+              <Plane className="w-4 h-4" />
+            </span>
+          </div>
+        )}
+
+        <div className="hl-grid">
+          {about.reasons.map((reason, i) => {
+            const st = reasonStyles[i % reasonStyles.length];
+            return (
+              <div key={`${reason.title}-${i}`} className="hl-card rv" style={stagger(i)}>
+                <span className="hl-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span className="hl-icon" style={{ background: st.bg, boxShadow: `0 12px 24px -10px ${st.glow}` }} aria-hidden="true">
+                  <st.icon className="w-6 h-6" />
+                </span>
+                <h3 className="hl-title">{reason.title}</h3>
+                <p className="hl-text">{reason.description}</p>
               </div>
-              <h3 className="font-tamil text-sm sm:text-lg md:text-xl font-bold text-white mb-1.5 sm:mb-2">{reason.title}</h3>
-              <p className="font-tamil text-white/60 text-[11px] sm:text-xs md:text-sm leading-relaxed">{reason.description}</p>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

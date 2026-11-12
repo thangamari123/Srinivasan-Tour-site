@@ -3,18 +3,18 @@ import { useState } from 'react';
 import { X, Download } from 'lucide-react';
 
 const galleryImages = [
-  { src: '/images/gallery1.webp', title: 'தாஜ்மஹால், ஆக்ரா', category: 'இந்தியா' },
-  { src: '/images/gallery2.webp', title: 'ஜெய்ப்பூர் அரண்மனை', category: 'இந்தியா' },
-  { src: '/images/gallery3.webp', title: 'பாலி கோவில், இந்தோனேசியா', category: 'வெளிநாடு' },
-  { src: '/images/gallery4.webp', title: 'ஸ்விஸ் ஆல்ப்ஸ்', category: 'வெளிநாடு' },
-  { src: '/images/gallery5.webp', title: 'முன்னார் தேயிலை தோட்டம்', category: 'இந்தியா' },
-  { src: '/images/gallery6.webp', title: 'இலங்கை கடற்கரை', category: 'வெளிநாடு' },
-  { src: '/images/pilgrimage.webp', title: 'திருப்பதி கோவில்', category: 'யாத்திரை' },
-  { src: '/images/package2.webp', title: 'கோவா கடற்கரை', category: 'இந்தியா' },
-  { src: '/images/package3.webp', title: 'சிங்கப்பூர் மரினா பே', category: 'வெளிநாடு' },
-  { src: '/images/package4.webp', title: 'மாலத்தீவு தீவுகள்', category: 'வெளிநாடு' },
-  { src: '/images/package5.webp', title: 'பாங்காக் அரண்மனை', category: 'வெளிநாடு' },
-  { src: '/images/package6.webp', title: 'ராமேஸ்வரம் கோவில்', category: 'யாத்திரை' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery1.webp', title: 'தாஜ்மஹால், ஆக்ரா', category: 'இந்தியா' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery2.webp', title: 'ஜெய்ப்பூர் அரண்மனை', category: 'இந்தியா' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery3.webp', title: 'பாலி கோவில், இந்தோனேசியா', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery4.webp', title: 'ஸ்விஸ் ஆல்ப்ஸ்', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery5.webp', title: 'முன்னார் தேயிலை தோட்டம்', category: 'இந்தியா' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery6.webp', title: 'இலங்கை கடற்கரை', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp', title: 'திருப்பதி கோவில்', category: 'யாத்திரை' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package2.webp', title: 'கோவா கடற்கரை', category: 'இந்தியா' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package3.webp', title: 'சிங்கப்பூர் மரினா பே', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package4.webp', title: 'மாலத்தீவு தீவுகள்', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package5.webp', title: 'பாங்காக் அரண்மனை', category: 'வெளிநாடு' },
+  { src: 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package6.webp', title: 'ராமேஸ்வரம் கோவில்', category: 'யாத்திரை' },
 ];
 
 const categories = ['அனைத்தும்', 'யாத்திரை', 'இந்தியா', 'வெளிநாடு'];
@@ -45,7 +45,7 @@ export default function Gallery() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/gallery1.webp"
+            src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery1.webp"
             alt="Gallery"
             className="w-full h-full object-cover opacity-20"
           />
@@ -60,7 +60,7 @@ export default function Gallery() {
             <span className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4">
               புகைப்படங்கள்
             </span>
-            <h1 className="font-tamil text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h1 className="font-tamil text-[1.75rem] leading-tight min-[375px]:text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 text-balance [overflow-wrap:anywhere]">
               எங்கள் பயண கேலரி
             </h1>
             <p className="font-tamil text-white/60 text-lg max-w-2xl mx-auto">
@@ -71,17 +71,17 @@ export default function Gallery() {
       </section>
 
       {/* Gallery */}
-      <section className="py-20 bg-white relative">
+      <section className="py-12 sm:py-20 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Filter */}
-          <div className="flex flex-wrap justify-center gap-3 mb-14">
+          <div className="flex sm:flex-wrap sm:justify-center gap-2 sm:gap-3 mb-8 sm:mb-14 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className={`px-6 py-3 rounded-2xl font-tamil font-semibold text-sm transition-all duration-300 ${
+                className={`shrink-0 whitespace-nowrap px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-tamil font-semibold text-sm transition-all duration-300 ${
                   activeFilter === cat
-                    ? 'bg-gradient-to-r from-navy-400 to-navy-600 text-white shadow-lg shadow-navy-400/25'
+                    ? 'bg-navy-900 text-white shadow-md shadow-navy-950/20'
                     : 'bg-navy-50 text-navy-600 hover:bg-navy-100'
                 }`}
               >
@@ -91,25 +91,27 @@ export default function Gallery() {
           </div>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
             {filteredImages.map((image, index) => (
               <motion.div
                 key={image.src}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className="gallery-zoom group relative rounded-2xl overflow-hidden cursor-pointer aspect-[4/3]"
+                className="gallery-zoom group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer aspect-square sm:aspect-[4/3] bg-slate-100"
                 onClick={() => setSelectedImage(image.src)}
               >
                 <img
                   src={image.src}
                   alt={image.title}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <p className="font-tamil text-white font-semibold text-sm">{image.title}</p>
-                  <p className="font-tamil text-white/60 text-xs">{image.category}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-0 left-0 right-0 p-2.5 sm:p-4 sm:translate-y-full sm:group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="font-tamil text-white font-semibold text-xs sm:text-sm line-clamp-1">{image.title}</p>
+                  <p className="font-tamil text-white/70 text-[11px] sm:text-xs">{image.category}</p>
                 </div>
               </motion.div>
             ))}

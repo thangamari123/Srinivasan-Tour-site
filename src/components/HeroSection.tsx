@@ -1,128 +1,297 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, ArrowRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ArrowRight, Globe, Phone, Send } from 'lucide-react';
+import { useSiteContent } from '../context/siteContentContext';
+import { defaultHomepage } from '../data/defaultContent';
+import '../styles/hero.css';
 
-const backgroundImages = [
-  '/images/pilgrimage.webp',
-  '/images/india-tour.webp',
-  '/images/international-tour.webp',
-  '/images/hero-bg.webp'
-];
+const FLIGHT_PATH = 'M40 380 C 10 280, 90 210, 200 190 S 400 120, 540 30';
+const FOREIGN_FALLBACK = 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/international-tour.webp';
 
-export default function HeroSection() {
-  const [currentImage, setCurrentImage] = useState(0);
+/** Pre-cropped responsive variants for the default temple photo (generated from https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp). */
+const TEMPLE = 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp';
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+/* ─── Count-up for the stats (once, when visible; 1s after load; 1.6s easeOutCubic) ─── */
+function parseStat(value: string) {
+  const m = /^(\d+)(.*)$/.exec(value.trim());
+  return m ? { target: Number(m[1]), suffix: m[2] } : null;
+}
+
+function useCountUp(targets: number[], ref: React.RefObject<HTMLElement | null>) {
+  const [values, setValues] = useState<number[]>(() => (prefersReducedMotion() ? targets : targets.map(() => 0)));
+  const key = targets.join(',');
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentImage((prev) => (prev + 1) % backgroundImages.length);
-    }, 5000); // Change image every 5 seconds
-    return () => clearInterval(timer);
-  }, []);
+    const final = key.split(',').map(Number);
+    if (prefersReducedMotion() || !ref.current) {
+      setValues(final);
+      return;
+    }
+    let raf = 0;
+    let timer = 0;
+    const loadedAt = performance.now();
+    const run = () => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / 1600);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setValues(final.map((n) => Math.round(n * eased)));
+        if (t < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        timer = window.setTimeout(run, Math.max(0, 1000 - (performance.now() - loadedAt)));
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(ref.current);
+    return () => {
+      io.disconnect();
+      clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, [key, ref]);
+
+  return values;
+}
+
+/* ─── Headline word with rise animation ─── */
+function Word({ children, delay }: { children: ReactNode; delay: number }) {
+  return (
+    <span className="h-mask">
+      <span className="h-rise" data-word style={{ animationDelay: `${delay}s` }}>
+        {children}
+      </span>
+    </span>
+  );
+}
+
+export default function HeroSection() {
+  const { homepage } = useSiteContent();
+  const hero = homepage.hero;
+
+  const images = (hero.backgroundImages ?? []).map((i) => i.url).filter(Boolean);
+  const defaults = defaultHomepage.hero.backgroundImages.map((i) => i.url);
+  const mainPhoto = images[0] || defaults[0];
+  const secondPhoto = images[1] || FOREIGN_FALLBACK;
+  const isDefaultTemple = mainPhoto === TEMPLE;
+
+  const prefixWords = hero.headingPrefix.split(/\s+/).filter(Boolean);
+  const suffixWords = hero.headingSuffix.split(/\s+/).filter(Boolean);
+  // Stagger: .2s, .3s, .4s … across every word of the headline
+  let wordIndex = 0;
+  const nextDelay = () => 0.2 + 0.1 * wordIndex++;
+
+  const ringText = `${hero.description.replace(/\s+[–-]\s+/g, ' • ')} • `;
+  // Letter-spacing / textLength stretching breaks Tamil glyph clusters on an SVG path,
+  // so those are only used for Latin text; Tamil is sized to fit the circle instead.
+  const ringIsLatin = /^[ -~•–]*$/.test(ringText);
+  const ringTextRef = useRef<SVGTextElement>(null);
+  useLayoutEffect(() => {
+    const el = ringTextRef.current;
+    if (!el || ringIsLatin) return;
+    const fit = () => {
+      el.setAttribute('font-size', '10.5');
+      const len = el.getComputedTextLength();
+      if (len > 0) el.setAttribute('font-size', String(Math.max(7, Math.min(12, (10.5 * 318) / len)).toFixed(2)));
+    };
+    fit();
+    document.fonts?.ready.then(fit).catch(() => undefined);
+  }, [ringText, ringIsLatin]);
+  const isInternal = hero.primaryCtaLink.startsWith('/');
+
+  /* Stats count-up */
+  const statsRef = useRef<HTMLDivElement>(null);
+  const parsed = hero.stats.map((s) => parseStat(s.value));
+  const counts = useCountUp(parsed.map((p) => p?.target ?? 0), statsRef);
+
+  /* Fit the Tamil headline to its column, scale the flight layer to the collage */
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const collageRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const title = titleRef.current;
+    const collage = collageRef.current;
+    if (!title || !collage) return;
+    const measure = () => {
+      title.style.removeProperty('--h-fit');
+      const fontSize = parseFloat(getComputedStyle(title).fontSize);
+      const widest = Math.max(...[...title.querySelectorAll<HTMLElement>('[data-word]')].map((w) => w.scrollWidth));
+      if (widest > 0) {
+        const fit = Math.floor((title.clientWidth / (widest / fontSize)) * 0.97);
+        if (fit < fontSize) title.style.setProperty('--h-fit', `${fit}px`);
+      }
+      collage.style.setProperty('--h-scale', String(Math.min(1, collage.clientWidth / 560)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(title);
+    ro.observe(collage);
+    // Web fonts change word widths once loaded
+    document.fonts?.ready.then(measure).catch(() => undefined);
+    return () => ro.disconnect();
+  }, [hero.headingPrefix, hero.headingHighlight, hero.headingSuffix]);
+
+  const primaryInner = (
+    <>
+      <span>{hero.primaryCtaLabel}</span>
+      <span className="h-btn-arrow" aria-hidden="true">
+        <ArrowRight className="w-5 h-5" />
+      </span>
+    </>
+  );
 
   return (
-    <section className="relative min-h-[100vh] flex items-center overflow-hidden bg-navy-950">
-      {/* Background Image Slider */}
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={backgroundImages[currentImage]}
-            src={backgroundImages[currentImage]}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 0.4, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="w-full h-full object-cover"
-            alt="Tour destination"
-          />
-        </AnimatePresence>
-        <div className="hero-gradient absolute inset-0 z-1" />
-      </div>
+    <section className="h-hero font-tamil" aria-labelledby="hero-title">
+      <div className="h-container h-grid">
+        {/* ── Text ── */}
+        <div>
+          <span className="h-badge h-up">
+            <span className="h-badge-dot" aria-hidden="true" />
+            {hero.badge}
+          </span>
 
-      {/* Decorative elements */}
-      <div className="absolute top-20 right-10 w-72 h-72 bg-gold-400/10 rounded-full blur-3xl z-1" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-navy-400/10 rounded-full blur-3xl z-1" />
-
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-14 sm:pb-24 w-full">
-        <div className="max-w-3xl">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-400/10 border border-gold-400/20 mb-6 sm:mb-8"
-          >
-            <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse" />
-            <span className="text-gold-400 text-xs sm:text-sm font-medium font-tamil">15+ ஆண்டுகள் நம்பிக்கையான சேவை</span>
-          </motion.div>
-
-          {/* Main Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="font-tamil text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 sm:mb-6"
-          >
-            உங்கள் கனவு பயணம்{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
-              இங்கே
-            </span>{' '}
-            ஆரம்பிக்கிறது!
-          </motion.h1>
-
-          {/* Subtext */}
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="font-tamil text-base sm:text-lg md:text-xl text-white/80 max-w-xl mb-8 sm:mb-10 leading-relaxed"
-          >
-            இந்தியா & வெளிநாட்டு சுற்றுலா – முழுமையான வசதியுடன்
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto"
-          >
-            <Link
-              to="/packages"
-              className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm sm:text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
-            >
-              இப்போதே பதிவு செய்யுங்கள்
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <a
-              href="tel:+919384854560"
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-sm sm:text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-[1.02] font-tamil"
-            >
-              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-              Call Now
-            </a>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14 pt-8 sm:pt-10 border-t border-white/10"
-          >
-            {[
-              { value: '15+', label: 'ஆண்டு அனுபவம்' },
-              { value: '10K+', label: 'மகிழ்ச்சியான பயணிகள்' },
-              { value: '200+', label: 'சுற்றுலா தொகுப்புகள்' },
-              { value: '50+', label: 'இடங்கள்' },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-white/5 sm:bg-transparent p-3 sm:p-0 rounded-xl border border-white/5 sm:border-0 text-center sm:text-left">
-                <p className="text-xl sm:text-3xl font-bold text-gold-400 font-heading">{stat.value}</p>
-                <p className="text-white/60 text-xs sm:text-sm font-tamil mt-0.5">{stat.label}</p>
-              </div>
+          <h1 id="hero-title" ref={titleRef} className="h-title">
+            {prefixWords.map((w, i) => (
+              <span key={`p${i}`}>
+                <Word delay={nextDelay()}>{w}</Word>{' '}
+              </span>
             ))}
-          </motion.div>
+            <br />
+            <span className="h-hl">
+              <Word delay={nextDelay()}>{hero.headingHighlight}</Word>
+              <svg className="h-brush" viewBox="0 0 220 28" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M6 18 C 60 6, 150 4, 214 14" fill="none" stroke="#F0B429" strokeWidth="14" strokeLinecap="round" />
+              </svg>
+            </span>{' '}
+            {suffixWords.map((w, i) => (
+              <span key={`s${i}`}>
+                <Word delay={nextDelay()}>{w}</Word>
+                {i < suffixWords.length - 1 ? ' ' : ''}
+              </span>
+            ))}
+          </h1>
+
+          <p className="h-sub h-up">{hero.description}</p>
+
+          <div className="h-btns h-up">
+            {isInternal ? (
+              <Link to={hero.primaryCtaLink} className="h-btn h-btn-primary">
+                {primaryInner}
+              </Link>
+            ) : (
+              <a href={hero.primaryCtaLink} className="h-btn h-btn-primary">
+                {primaryInner}
+              </a>
+            )}
+            <a href={`tel:${hero.phone}`} className="h-btn h-btn-secondary">
+              <span className="h-btn-icon" aria-hidden="true">
+                <Phone className="w-[18px] h-[18px] h-ring-icon" />
+              </span>
+              <span>{hero.secondaryCtaLabel}</span>
+            </a>
+          </div>
+
+          <div ref={statsRef} className="h-stats h-up">
+            {hero.stats.map((stat, i) => {
+              const p = parsed[i];
+              const suffix = p?.suffix ?? '';
+              const plus = suffix.endsWith('+');
+              return (
+                <div key={stat.label} className="h-stat">
+                  <span className="h-stat-num">
+                    {p ? (
+                      <>
+                        {counts[i]}
+                        {plus ? suffix.slice(0, -1) : suffix}
+                        {plus && <span className="h-stat-plus">+</span>}
+                      </>
+                    ) : (
+                      stat.value
+                    )}
+                  </span>
+                  <span className="h-stat-label">{stat.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Photo collage (decorative) ── */}
+        <div ref={collageRef} className="h-collage h-up" aria-hidden="true">
+          <div className="h-photo">
+            {isDefaultTemple ? (
+              <picture>
+                <source media="(max-width: 767px)" srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-landscape-640.webp 640w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp 940w" sizes="100vw" width={640} height={427} />
+                <img
+                  src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp"
+                  srcSet="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-360.webp 360w, https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-temple-portrait-487.webp 487w"
+                  sizes="420px"
+                  width={487}
+                  height={627}
+                  alt=""
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </picture>
+            ) : (
+              <img src={mainPhoto} alt="" width={420} height={540} fetchPriority="high" decoding="async" />
+            )}
+          </div>
+
+          <div className="h-photo2">
+            <img
+              src={secondPhoto === FOREIGN_FALLBACK ? 'https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/hero-foreign-500.webp' : secondPhoto}
+              alt=""
+              width={250}
+              height={230}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <div className="h-spin">
+            <svg className="h-spin-ring" viewBox="0 0 140 140">
+              <defs>
+                <path id="h-ring-path" d="M70 70 m -52 0 a 52 52 0 1 1 104 0 a 52 52 0 1 1 -104 0" />
+              </defs>
+              <circle cx="70" cy="70" r="68" fill="#0F1E3A" />
+              <text
+                ref={ringTextRef}
+                fill="#F0B429"
+                fontFamily="Inter, 'Noto Sans Tamil', sans-serif"
+                fontSize="10.5"
+                fontWeight="700"
+                letterSpacing={ringIsLatin ? 2.4 : 0}
+              >
+                {ringIsLatin ? (
+                  <textPath href="#h-ring-path" textLength="318" lengthAdjust="spacing">
+                    {ringText}
+                  </textPath>
+                ) : (
+                  <textPath href="#h-ring-path">{ringText}</textPath>
+                )}
+              </text>
+            </svg>
+            <span className="h-spin-center">
+              <Globe className="w-[42%] h-[42%]" />
+            </span>
+          </div>
+
+          <div className="h-flight">
+            <svg width="560" height="420" viewBox="0 0 560 420" fill="none">
+              <path d={FLIGHT_PATH} stroke="#D99A0B" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            <span className="h-plane">
+              <Send className="w-4 h-4" style={{ transform: 'rotate(45deg)' }} />
+            </span>
+          </div>
         </div>
       </div>
     </section>

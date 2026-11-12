@@ -1,52 +1,74 @@
-import { motion } from 'framer-motion';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Phone } from 'lucide-react';
+import { ArrowRight, Phone, Send } from 'lucide-react';
+import { useSiteContent } from '../context/siteContentContext';
+import { useReveal } from '../hooks/useReveal';
+import '../styles/home.css';
 
+const ROUTE = 'M-20 300 C 200 120, 420 360, 700 160 S 1100 40, 1300 120';
+
+/** CTA styled as a boarding pass. All text comes from Homepage → Call to action. */
 export default function CTABanner() {
-  return (
-    <section className="relative py-16 sm:py-24 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-700 to-navy-900" />
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gold-400 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-navy-300 rounded-full blur-3xl" />
-      </div>
+  const { homepage } = useSiteContent();
+  const cta = homepage.cta;
+  const passRef = useRef<HTMLDivElement>(null);
+  useReveal(passRef, ['.bp']); // adds .is-in → draws the brush stroke
 
-      <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <span className="inline-block px-3.5 py-1 bg-gold-400/10 text-gold-400 text-xs sm:text-sm font-semibold rounded-full font-tamil mb-4 sm:mb-6">
-            இப்போதே தொடங்குங்கள்
-          </span>
-          <h2 className="font-tamil text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-            இப்போதே உங்கள் பயணத்தை{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-300 to-gold-500">
-              தொடங்குங்கள்
+  const primaryInner = (
+    <>
+      <span>{cta.primaryLabel}</span>
+      <span className="bp-circle" aria-hidden="true">
+        <ArrowRight className="w-5 h-5" />
+      </span>
+    </>
+  );
+
+  return (
+    <section className="s-sec s-ivory font-tamil" aria-labelledby="cta-title">
+      <div className="h-container">
+        <div ref={passRef} className="bp rv">
+          <div className="bp-main">
+            <span className="bp-orb bp-orb-1" aria-hidden="true" />
+            <span className="bp-orb bp-orb-2" aria-hidden="true" />
+            <svg className="bp-route" viewBox="0 0 1300 420" fill="none" aria-hidden="true">
+              <path d={ROUTE} stroke="rgba(240,180,41,.5)" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+            <span className="bp-plane" aria-hidden="true">
+              <Send className="w-4 h-4" style={{ transform: 'rotate(45deg)' }} />
             </span>
-          </h2>
-          <p className="font-tamil text-white/70 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-            உங்கள் கனவு பயணத்தை நிஜமாக்க எங்களை தொடர்பு கொள்ளுங்கள். இன்றே உங்கள் இடத்தை உறுதி செய்யுங்கள்!
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto">
-            <Link
-              to="/contact"
-              className="group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-sm sm:text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-xl shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
-            >
-              இப்போதே பதிவு செய்யுங்கள்
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <a
-              href="tel:+919384854560"
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm text-white font-bold text-sm sm:text-base rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-[1.02] font-tamil"
-            >
-              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-              அழைக்கவும்
-            </a>
+
+            <div className="bp-content">
+              <span className="s-eyebrow s-eyebrow-navy">{cta.badge}</span>
+              <h2 id="cta-title" className="bp-h2">
+                {cta.headingPrefix}{' '}
+                <span className="bp-hl">
+                  <span>{cta.headingHighlight}</span>
+                  <svg className="bp-brush" viewBox="0 0 220 28" preserveAspectRatio="none" aria-hidden="true">
+                    <path d="M6 18 C 60 6, 150 4, 214 14" fill="none" stroke="#F0B429" strokeWidth="14" strokeLinecap="round" />
+                  </svg>
+                </span>
+              </h2>
+              <p className="bp-lead">{cta.description}</p>
+              <div className="bp-btns">
+                {cta.primaryLink.startsWith('/') ? (
+                  <Link to={cta.primaryLink} className="bp-btn bp-btn-gold">
+                    {primaryInner}
+                  </Link>
+                ) : (
+                  <a href={cta.primaryLink} className="bp-btn bp-btn-gold">
+                    {primaryInner}
+                  </a>
+                )}
+                <a href={`tel:${cta.phone}`} className="bp-btn bp-btn-ghost">
+                  <span className="bp-circle" aria-hidden="true">
+                    <Phone className="w-[18px] h-[18px] h-ring-icon" />
+                  </span>
+                  <span>{cta.secondaryLabel}</span>
+                </a>
+              </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

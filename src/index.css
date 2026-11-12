@@ -20,6 +20,61 @@
   --font-heading: 'Playfair Display', serif;
   --font-body: 'Inter', sans-serif;
   --font-tamil: 'Noto Sans Tamil', sans-serif;
+
+  /* ── Design tokens (UI refresh) ───────────────────────────── */
+  --color-ink: #0f1f3d;          /* headings on light backgrounds (= navy-900) */
+  --color-ink-muted: #51607a;    /* body copy on light backgrounds */
+  --color-surface: #f6f8fc;      /* light section background */
+  --color-line: #e3e9f3;         /* card borders / dividers */
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 2px rgb(10 22 40 / 0.04), 0 8px 24px -10px rgb(10 22 40 / 0.12);
+  --shadow-card-hover: 0 2px 6px rgb(10 22 40 / 0.06), 0 22px 44px -16px rgb(10 22 40 / 0.22);
+}
+
+/* Section eyebrow badge — one consistent style for light & dark sections */
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--color-navy-700);
+  background: var(--color-navy-50);
+  border: 1px solid var(--color-navy-100);
+}
+@utility eyebrow-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  font-weight: 600;
+  color: var(--color-gold-400);
+  background: rgb(230 180 34 / 0.1);
+  border: 1px solid rgb(230 180 34 / 0.22);
+}
+
+/* Elevated white card */
+@utility card-elevated {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* Enlarge the touch area of tiny controls (slider dots) without changing their look */
+@utility tap-area {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+  }
 }
 
 html {
@@ -28,6 +83,9 @@ html {
 
 body {
   font-family: var(--font-body);
+  color: var(--color-ink);
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -41,6 +99,23 @@ body {
 
 .font-tamil {
   font-family: var(--font-tamil), var(--font-body), sans-serif;
+}
+
+/* Visible keyboard focus everywhere (mouse/touch clicks are unaffected) */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-gold-400);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .font-heading {
@@ -166,4 +241,10 @@ body {
 .goog-text-highlight {
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+/* Admin panel toast entrance */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

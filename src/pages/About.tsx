@@ -24,7 +24,7 @@ export default function About() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/india-tour.webp"
+            src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/india-tour.webp"
             alt="About us"
             className="w-full h-full object-cover opacity-20"
           />
@@ -39,7 +39,7 @@ export default function About() {
             <span className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4">
               எங்களைப் பற்றி
             </span>
-            <h1 className="font-tamil text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h1 className="font-tamil text-[1.75rem] leading-tight min-[375px]:text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 text-balance [overflow-wrap:anywhere]">
               ஸ்ரீநிவாசா டூர் ஆபரேட்டர்ஸ்
             </h1>
             <p className="font-tamil text-white/60 text-lg max-w-2xl mx-auto">
@@ -61,7 +61,7 @@ export default function About() {
             >
               <div className="relative">
                 <img
-                  src="/images/pilgrimage.webp"
+                  src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/homepage/pilgrimage.webp"
                   alt="Our story"
                   className="w-full h-96 object-cover rounded-3xl shadow-2xl"
                 />

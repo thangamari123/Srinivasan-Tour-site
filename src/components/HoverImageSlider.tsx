@@ -11,24 +11,25 @@ export default function HoverImageSlider({ images, title }: HoverImageSliderProp
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setInterval>;
-    if (isHovered && images.length > 1) {
-      timer = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % images.length);
-      }, 1500); // Change image every 1.5 seconds
-    } else {
-      setCurrentIndex(0); // Reset to first image when not hovering
-    }
+    if (!isHovered || images.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 1500); // Change image every 1.5 seconds
     return () => clearInterval(timer);
   }, [isHovered, images.length]);
+
+  const stopHover = () => {
+    setIsHovered(false);
+    setCurrentIndex(0);
+  };
 
   return (
     <div 
       className="relative w-full h-full overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={stopHover}
       onTouchStart={() => setIsHovered(true)}
-      onTouchEnd={() => setIsHovered(false)}
+      onTouchEnd={stopHover}
     >
       <AnimatePresence initial={false} custom={currentIndex}>
         <motion.img

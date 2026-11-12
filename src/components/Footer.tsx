@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, MapPin, Facebook, Instagram, Youtube, ChevronDown } from 'lucide-react';
+import { Phone, MapPin, Facebook, Instagram, Youtube, ChevronDown, ShieldCheck } from 'lucide-react';
+import '../styles/home.css';
 
 const quickLinks = [
   { name: 'முகப்பு', path: '/' },
@@ -19,210 +20,147 @@ const tourTypes = [
   'அதிசயங்களின் நகரம் துபாய்',
 ];
 
-export default function Footer() {
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    links: false,
-    tours: false,
-    contact: false,
-  });
+const socials = [
+  { href: 'https://www.facebook.com/profile.php?id=61570715695145', label: 'Facebook', icon: Facebook },
+  { href: 'https://www.instagram.com/madhumalathi151/', label: 'Instagram', icon: Instagram },
+  { href: 'https://www.youtube.com/@Srinivasa_tour', label: 'YouTube', icon: Youtube },
+];
 
-  const toggleSection = (section: string) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
+function useIsMobile() {
+  const query = '(max-width: 767px)';
+  const [mobile, setMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setMobile(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return mobile;
+}
+
+/** Link column: always open on tablet/desktop, a <details> accordion on mobile. */
+function LinkColumn({ title, mobile, children }: { title: string; mobile: boolean; children: ReactNode }) {
+  return (
+    <details className="ft-col" open={mobile ? undefined : true}>
+      <summary
+        className="ft-title"
+        onClick={(e) => {
+          if (!mobile) e.preventDefault(); // not collapsible on larger screens
+        }}
+      >
+        <h4>{title}</h4>
+        <ChevronDown className="ft-chev w-4 h-4" aria-hidden="true" />
+      </summary>
+      {children}
+    </details>
+  );
+}
+
+export default function Footer() {
+  const mobile = useIsMobile();
 
   return (
-    <footer className="bg-navy-950 text-white font-tamil">
-      {/* Top decorative line */}
-      <div className="h-1 bg-gradient-to-r from-gold-400 via-navy-400 to-gold-400" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 lg:gap-12">
+    <footer className="ft font-tamil">
+      <div className="h-container">
+        <div className="ft-grid">
           {/* Brand */}
-          <div className="lg:col-span-1 pb-4 md:pb-0 border-b border-white/10 md:border-b-0">
-            <div className="flex items-center gap-3 mb-4 sm:mb-5">
-              <img
-                src="/images/logo.webp"
-                alt="ஸ்ரீநிவாசா Tour Operators"
-                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl shadow-lg shadow-gold-500/20 object-cover"
-              />
-              <div>
-                <p className="font-bold text-base sm:text-lg leading-tight">ஸ்ரீநிவாசா</p>
-                <p className="text-gold-400 text-[10px] sm:text-xs font-medium tracking-widest uppercase">Tour Operators</p>
-              </div>
-            </div>
-            <p className="text-white/60 text-xs sm:text-sm leading-relaxed mb-5">
+          <div className="ft-brand-col">
+            <Link to="/" className="ft-brand">
+              <span className="ft-tile">
+                <img src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/logo/logo.webp" alt="ஸ்ரீநிவாசா Tour Operators" width={46} height={46} loading="lazy" />
+              </span>
+              <span>
+                <span className="ft-name block">ஸ்ரீநிவாசா</span>
+                <span className="ft-sub block">Tour Operators</span>
+              </span>
+            </Link>
+            <p className="ft-about">
               15+ ஆண்டுகள் அனுபவம் கொண்ட நம்பிக்கையான சுற்றுலா நிறுவனம். உங்கள் கனவு பயணத்தை நாங்கள் நிஜமாக்குகிறோம்.
             </p>
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <a
-                href="https://www.facebook.com/profile.php?id=61570715695145"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.instagram.com/madhumalathi151/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a
-                href="https://www.youtube.com/@Srinivasa_tour"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 hover:bg-gold-400/20 border border-white/10 flex items-center justify-center text-white/60 hover:text-gold-400 transition-all"
-                aria-label="YouTube"
-              >
-                <Youtube className="w-4 h-4" />
-              </a>
+            <div className="ft-social">
+              {socials.map((s) => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+                  <s.icon className="w-[18px] h-[18px]" aria-hidden="true" />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Quick Links (Foldable on Mobile) */}
-          <div className="border-b border-white/10 md:border-b-0 pb-2 md:pb-0">
-            <button
-              type="button"
-              onClick={() => toggleSection('links')}
-              className="w-full flex items-center justify-between py-2 md:py-0 md:mb-5 text-left md:cursor-default"
-              aria-expanded={openSections.links}
-            >
-              <h4 className="text-gold-400 font-bold text-sm uppercase tracking-wider">விரைவு இணைப்புகள்</h4>
-              <ChevronDown
-                className={`w-4 h-4 text-gold-400 md:hidden transition-transform duration-300 ${
-                  openSections.links ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            <div
-              className={`transition-all duration-300 overflow-hidden ${
-                openSections.links
-                  ? 'max-h-96 opacity-100 pt-2 pb-2 md:pt-0 md:pb-0'
-                  : 'max-h-0 opacity-0 md:max-h-none md:opacity-100'
-              }`}
-            >
-              <ul className="space-y-2.5 sm:space-y-3">
-                {quickLinks.map((link) => (
-                  <li key={link.path}>
-                    <Link
-                      to={link.path}
-                      className="text-white/70 hover:text-gold-400 text-xs sm:text-sm transition-colors duration-200 hover:translate-x-1 inline-block"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          {/* Quick links */}
+          <LinkColumn title="விரைவு இணைப்புகள்" mobile={mobile}>
+            <ul className="ft-list">
+              {quickLinks.map((link) => (
+                <li key={link.path}>
+                  <Link to={link.path}>{link.name}</Link>
+                </li>
+              ))}
+            </ul>
+          </LinkColumn>
 
-          {/* Tour Types (Foldable on Mobile) */}
-          <div className="border-b border-white/10 md:border-b-0 pb-2 md:pb-0">
-            <button
-              type="button"
-              onClick={() => toggleSection('tours')}
-              className="w-full flex items-center justify-between py-2 md:py-0 md:mb-5 text-left md:cursor-default"
-              aria-expanded={openSections.tours}
-            >
-              <h4 className="text-gold-400 font-bold text-sm uppercase tracking-wider">சுற்றுலா வகைகள்</h4>
-              <ChevronDown
-                className={`w-4 h-4 text-gold-400 md:hidden transition-transform duration-300 ${
-                  openSections.tours ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            <div
-              className={`transition-all duration-300 overflow-hidden ${
-                openSections.tours
-                  ? 'max-h-96 opacity-100 pt-2 pb-2 md:pt-0 md:pb-0'
-                  : 'max-h-0 opacity-0 md:max-h-none md:opacity-100'
-              }`}
-            >
-              <ul className="space-y-2.5 sm:space-y-3">
-                {tourTypes.map((tour) => (
-                  <li key={tour}>
-                    <Link
-                      to="/packages"
-                      className="text-white/70 hover:text-gold-400 text-xs sm:text-sm transition-colors duration-200 hover:translate-x-1 inline-block"
-                    >
-                      {tour}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          {/* Tour types */}
+          <LinkColumn title="சுற்றுலா வகைகள்" mobile={mobile}>
+            <ul className="ft-list">
+              {tourTypes.map((tour) => (
+                <li key={tour}>
+                  <Link to="/packages">{tour}</Link>
+                </li>
+              ))}
+            </ul>
+          </LinkColumn>
 
-          {/* Contact (Foldable on Mobile) */}
-          <div className="border-b border-white/10 md:border-b-0 pb-2 md:pb-0">
-            <button
-              type="button"
-              onClick={() => toggleSection('contact')}
-              className="w-full flex items-center justify-between py-2 md:py-0 md:mb-5 text-left md:cursor-default"
-              aria-expanded={openSections.contact}
-            >
-              <h4 className="text-gold-400 font-bold text-sm uppercase tracking-wider">தொடர்பு</h4>
-              <ChevronDown
-                className={`w-4 h-4 text-gold-400 md:hidden transition-transform duration-300 ${
-                  openSections.contact ? 'rotate-180' : ''
-                }`}
-              />
-            </button>
-            <div
-              className={`transition-all duration-300 overflow-hidden ${
-                openSections.contact
-                  ? 'max-h-[500px] opacity-100 pt-2 pb-3 md:pt-0 md:pb-0'
-                  : 'max-h-0 opacity-0 md:max-h-none md:opacity-100'
-              }`}
-            >
-              <ul className="space-y-3 sm:space-y-4">
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-gold-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Head Office</p>
-                    <p className="text-white/80 text-xs sm:text-sm">19/34, Venkataraman Street,</p>
-                    <p className="text-white/80 text-xs sm:text-sm">Perambur, Chennai - 600 011.</p>
-                    <p className="text-white/60 text-[11px] sm:text-xs mt-0.5">(Opp. Railway Station & Bus Stand)</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-gold-400 text-xs font-semibold uppercase tracking-wider mb-0.5">Branch</p>
-                    <p className="text-white/80 text-xs sm:text-sm">No. 10, 1st Cross Street,</p>
-                    <p className="text-white/80 text-xs sm:text-sm">Kalyan Nagar, West Tambaram,</p>
-                    <p className="text-white/80 text-xs sm:text-sm">Chennai - 600 045.</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Phone className="w-4 h-4 text-gold-400 mt-0.5 shrink-0" />
-                  <div>
-                    <a href="tel:+919384854560" className="text-white/90 text-xs sm:text-sm hover:text-gold-400 transition-colors">
-                      93848 54560, 93848 54561
-                    </a>
-                  </div>
-                </li>
-              </ul>
-            </div>
+          {/* Contact */}
+          <div className="ft-contact-col">
+            <h4 className="ft-title">தொடர்பு</h4>
+            <ul className="ft-contact">
+              <li>
+                <span className="ft-ci" aria-hidden="true">
+                  <MapPin className="w-[18px] h-[18px]" />
+                </span>
+                <div>
+                  <p className="ft-label">Head Office</p>
+                  <p className="ft-addr">
+                    19/34, Venkataraman Street,
+                    <br />
+                    Perambur, Chennai - 600 011.
+                  </p>
+                  <p className="ft-addr-note">(Opp. Railway Station & Bus Stand)</p>
+                </div>
+              </li>
+              <li>
+                <span className="ft-ci" aria-hidden="true">
+                  <MapPin className="w-[18px] h-[18px]" />
+                </span>
+                <div>
+                  <p className="ft-label">Branch</p>
+                  <p className="ft-addr">
+                    No. 10, 1st Cross Street,
+                    <br />
+                    Kalyan Nagar, West Tambaram,
+                    <br />
+                    Chennai - 600 045.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span className="ft-ci ft-ci-solid" aria-hidden="true">
+                  <Phone className="w-[18px] h-[18px]" />
+                </span>
+                <div>
+                  <a href="tel:+919384854560" className="ft-phone">93848 54560</a>
+                  <span className="text-[#93A0BA]">, </span>
+                  <a href="tel:+919384854561" className="ft-phone">93848 54561</a>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3 text-center sm:text-left">
-          <p className="text-white/40 text-[11px] sm:text-xs">
-            © 2026 ஸ்ரீநிவாசா டூர் ஆபரேட்டர்ஸ். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.
+        <div className="ft-bottom">
+          <p>© 2026 ஸ்ரீநிவாசா டூர் ஆபரேட்டர்ஸ். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.</p>
+          <p className="ft-iso">
+            <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+            ISO 9001:2015 சான்றிதழ் பெற்ற நிறுவனம்
           </p>
-          <p className="text-white/30 text-[11px] sm:text-xs">ISO 9001:2015 சான்றிதழ் பெற்ற நிறுவனம்</p>
         </div>
       </div>
     </footer>

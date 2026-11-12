@@ -1,247 +1,366 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Bus, Bed, Utensils, ArrowRight, MapPin } from 'lucide-react';
-import { allPackages } from '../data/packages';
-import HoverImageSlider from '../components/HoverImageSlider';
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowRight, MapPin, Phone, RotateCcw, Search, SlidersHorizontal, X } from 'lucide-react';
+import { useSiteContent } from '../context/siteContentContext';
+import { PackageGridSkeleton } from '../components/PackageCardSkeleton';
+import PackageCard from '../components/PackageCard';
+import { resolveMediaUrl } from '../lib/r2Media';
+import '../styles/home.css';
 
-const inclusionIcons: Record<string, typeof Bus> = {
-  'போக்குவரத்து': Bus,
-  'விமானம்': Bus,
-  'தங்குமிடம்': Bed,
-  'ரிசோர்ட்': Bed,
-  'உணவு': Utensils,
-};
+type SortMode = 'recommended' | 'durationAsc' | 'durationDesc' | 'priceAsc';
+
+function parsePriceNumber(price: string): number {
+  const digits = price.replace(/[^0-9]/g, '');
+  return digits ? parseInt(digits, 10) : Number.MAX_SAFE_INTEGER;
+}
+
+function parseDaysNumber(duration: string): number {
+  const m = /\d+/.exec(duration);
+  return m ? parseInt(m[0], 10) : 0;
+}
 
 export default function Packages() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const { packages: allPackages, categories, destinations, homepage, loading, error } = useSiteContent();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const destinationSlug = searchParams.get('destination') ?? '';
+  const categoryParam = searchParams.get('category') ?? 'all';
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
+  const [categoryFilter, setCategoryFilter] = useState(() => categoryParam || 'all');
   const [durationFilter, setDurationFilter] = useState('all');
-  const [tourNameFilter, setTourNameFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<SortMode>('recommended');
 
-  const currentPackages = allPackages.filter((pkg) => {
-    // Search Filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      const matchTitle = pkg.title?.toLowerCase().includes(query);
-      const matchDesc = pkg.shortDescription?.toLowerCase().includes(query);
-      const matchSlug = pkg.slug?.toLowerCase().includes(query);
-      const matchTag = pkg.categoryTag?.toLowerCase().includes(query);
-      const matchPlaces = pkg.placesToVisit?.some(p => p?.toLowerCase().includes(query));
+  const activeDestination = destinations.find((d) => d.slug === destinationSlug);
+  const heroBg = resolveMediaUrl('https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/package3.webp');
 
-      if (!matchTitle && !matchDesc && !matchSlug && !matchTag && !matchPlaces) {
-        return false;
+  const categoryTabs = useMemo(() => {
+    const counts = new Map<string, { slug: string; name: string; count: number }>();
+    allPackages.forEach((pkg) => {
+      if (!pkg.category) return;
+      const existing = counts.get(pkg.category);
+      if (existing) existing.count += 1;
+      else counts.set(pkg.category, { slug: pkg.category, name: pkg.categoryTag || pkg.category, count: 1 });
+    });
+    const ordered: { slug: string; name: string; count: number }[] = [];
+    categories.forEach((cat) => {
+      const hit = counts.get(cat.slug);
+      if (hit) ordered.push(hit);
+    });
+    counts.forEach((val, key) => {
+      if (!ordered.some((o) => o.slug === key)) ordered.push(val);
+    });
+    return ordered;
+  }, [allPackages, categories]);
+
+  const currentPackages = useMemo(() => {
+    const filtered = allPackages.filter((pkg) => {
+      if (destinationSlug && pkg.destinationSlug !== destinationSlug) return false;
+      if (categoryFilter !== 'all' && pkg.category !== categoryFilter) return false;
+
+      if (searchQuery.trim()) {
+        const query = searchQuery.trim().toLowerCase();
+        const match = [
+          pkg.title,
+          pkg.shortDescription,
+          pkg.slug,
+          pkg.categoryTag,
+          pkg.destinationName,
+          pkg.startingLocation,
+          ...(pkg.placesToVisit ?? []),
+        ]
+          .filter(Boolean)
+          .some((field) => field.toLowerCase().includes(query));
+        if (!match) return false;
       }
-    }
 
-    // Tour Name Filter
-    if (tourNameFilter !== 'all' && pkg.title !== tourNameFilter) {
-      return false;
-    }
-
-    // Duration Filter
-    if (durationFilter !== 'all') {
-      const daysStr = pkg.duration.replace(/[^0-9]/g, '');
-      const days = parseInt(daysStr, 10);
-      
-      if (!isNaN(days)) {
-        if (durationFilter === 'short' && days > 5) return false;
-        if (durationFilter === 'medium' && (days < 6 || days > 10)) return false;
-        if (durationFilter === 'long' && days < 11) return false;
+      if (durationFilter !== 'all') {
+        const days = parseDaysNumber(pkg.duration);
+        if (days > 0) {
+          if (durationFilter === 'short' && days > 5) return false;
+          if (durationFilter === 'medium' && (days < 6 || days > 10)) return false;
+          if (durationFilter === 'long' && days < 11) return false;
+        }
       }
-    }
 
-    return true;
-  });
+      return true;
+    });
+
+    if (sortBy === 'recommended') return filtered;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === 'durationAsc') return parseDaysNumber(a.duration) - parseDaysNumber(b.duration);
+      if (sortBy === 'durationDesc') return parseDaysNumber(b.duration) - parseDaysNumber(a.duration);
+      return parsePriceNumber(a.price) - parsePriceNumber(b.price);
+    });
+  }, [allPackages, destinationSlug, categoryFilter, searchQuery, durationFilter, sortBy]);
+
+  const hasActiveFilters = Boolean(searchQuery.trim() || destinationSlug || categoryFilter !== 'all' || durationFilter !== 'all' || sortBy !== 'recommended');
+
+  const updateDestination = (slug: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (slug) next.set('destination', slug);
+    else next.delete('destination');
+    setSearchParams(next, { replace: true });
+  };
+
+  const updateCategory = (slug: string) => {
+    setCategoryFilter(slug);
+    const next = new URLSearchParams(searchParams);
+    if (slug && slug !== 'all') next.set('category', slug);
+    else next.delete('category');
+    setSearchParams(next, { replace: true });
+  };
+
+  const resetAll = () => {
+    setSearchQuery('');
+    setCategoryFilter('all');
+    setDurationFilter('all');
+    setSortBy('recommended');
+    setSearchParams({}, { replace: true });
+  };
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
+      {/* Editorial Navy Header */}
+      <section className="relative pt-32 pb-16 sm:pt-36 sm:pb-20 bg-[var(--h-navy)] overflow-hidden font-tamil">
         <div className="absolute inset-0">
-          <img
-            src="/images/package3.webp"
-            alt="Packages"
-            className="w-full h-full object-cover opacity-20"
+          <img src={heroBg} alt="சுற்றுலா தொகுப்புகள்" className="w-full h-full object-cover opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f1e3a]/85 via-[#0f1e3a]/90 to-[#0f1e3a]" />
+          <div
+            className="absolute -top-24 left-1/2 -translate-x-1/2 w-[540px] h-[280px] rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(240, 180, 41, 0.16), transparent 70%)' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-950/80 to-navy-950" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
-            <span className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4">
-              சுற்றுலா தொகுப்புகள்
-            </span>
-            <h1 className="font-tamil text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-              உங்களுக்கான சிறந்த தொகுப்புகள்
+
+        <div className="relative h-container text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+            <span className="s-eyebrow s-eyebrow-navy">சுற்றுலா தொகுப்புகள்</span>
+            <h1 className="mt-4 font-tamil text-[1.85rem] leading-tight min-[375px]:text-3xl sm:text-5xl font-extrabold text-white text-balance [overflow-wrap:anywhere]">
+              {activeDestination ? `${activeDestination.name} சுற்றுலா தொகுப்புகள்` : 'உங்களுக்கான சிறந்த பயணத் தொகுப்புகள்'}
             </h1>
-            <p className="font-tamil text-white/60 text-lg max-w-2xl mx-auto">
-              அனைத்து சுற்றுலா தொகுப்புகள் – உங்கள் விருப்பத்தை தேர்வு செய்யுங்கள்
+            <p className="mt-3 sm:mt-4 text-white/75 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              புனித யாத்திரை, இந்திய சுற்றுலா மற்றும் வெளிநாட்டுப் பயணங்கள் – முழுமையான ஏற்பாடுகளுடன் உங்கள் விருப்பத்தைத் தேர்ந்தெடுங்கள்.
             </p>
+
+            {!loading && allPackages.length > 0 && (
+              <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs sm:text-sm text-white/85">
+                <span className="px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm">
+                  <strong className="text-[var(--h-gold)] font-bold">{allPackages.length}</strong> தொகுப்புகள்
+                </span>
+                {destinations.length > 0 && (
+                  <span className="px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-sm">
+                    <strong className="text-[var(--h-gold)] font-bold">{destinations.length}</strong> முக்கிய இடங்கள்
+                  </span>
+                )}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
 
-      {/* Packages Section */}
-      <section className="py-20 bg-white relative">
-        <div className="absolute inset-0 pattern-dots opacity-30" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Filter Section */}
-          <div className="bg-white p-6 rounded-3xl shadow-lg shadow-navy-950/5 border border-navy-100/30 mb-14">
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full">
-              
+      {/* Main Listing Section (matches homepage ivory canvas + .pk-card editorial grid) */}
+      <section className="s-sec s-ivory !pt-10 sm:!pt-14 font-tamil" aria-label="சுற்றுலா தொகுப்புகள் பட்டியல்">
+        <div className="h-container">
+          {/* Category Pills matching FeaturedPackages */}
+          {!loading && categoryTabs.length > 1 && (
+            <div className="flex justify-start sm:justify-center mb-6">
+              <div className="pk-tabs !mb-0" role="group" aria-label="பிரிவு அடிப்படையில் தேடுக">
+                <button
+                  type="button"
+                  className="pk-tab"
+                  aria-pressed={categoryFilter === 'all'}
+                  onClick={() => updateCategory('all')}
+                >
+                  அனைத்தும் ({allPackages.length})
+                </button>
+                {categoryTabs.map((t) => (
+                  <button
+                    key={t.slug}
+                    type="button"
+                    className="pk-tab"
+                    aria-pressed={categoryFilter === t.slug}
+                    onClick={() => updateCategory(t.slug)}
+                  >
+                    {t.name} ({t.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Filter & Search Toolbar */}
+          <div className="rounded-[22px] bg-white border border-[var(--s-line)] shadow-[0_8px_28px_-16px_rgba(15,30,58,0.18)] p-4 sm:p-5 mb-8 sm:mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3">
               {/* Search */}
-              <div className="relative w-full sm:w-80">
-                <input 
-                  type="text" 
-                  placeholder="தேடுக..." 
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--h-muted)] pointer-events-none" aria-hidden="true" />
+                <input
+                  type="text"
+                  placeholder="பெயர், ஊர் அல்லது கோவில் தேடுக..."
+                  aria-label="சுற்றுலா தொகுப்புகளைத் தேடுங்கள்"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl bg-navy-50 border-none focus:ring-2 focus:ring-gold-400 font-tamil text-sm"
+                  className="w-full h-11 pl-10 pr-9 rounded-xl bg-[var(--h-ivory)] border border-[var(--s-line)] focus:border-[var(--h-gold)] focus:bg-white focus:outline-none text-sm text-[var(--h-navy)] placeholder:text-[var(--h-muted)] transition-colors"
                 />
-                <svg className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-navy-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    aria-label="தேடலை அழி"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-[var(--h-muted)] hover:text-[var(--h-navy)] hover:bg-black/5"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
-              {/* Tour Name Filter */}
-              <select 
-                value={tourNameFilter}
-                onChange={(e) => setTourNameFilter(e.target.value)}
-                className="px-4 py-2.5 rounded-xl bg-navy-50 border-none focus:ring-2 focus:ring-gold-400 font-tamil text-sm text-navy-600 outline-none w-full sm:w-48 appearance-none cursor-pointer"
+              {/* Destination Filter */}
+              <select
+                value={destinationSlug}
+                onChange={(e) => updateDestination(e.target.value)}
+                aria-label="இடத்தைத் தேர்ந்தெடுக்கவும்"
+                className="h-11 px-3.5 rounded-xl bg-[var(--h-ivory)] border border-[var(--s-line)] focus:border-[var(--h-gold)] focus:bg-white focus:outline-none text-sm text-[var(--h-navy)] cursor-pointer"
               >
-                <option value="all">சுற்றுலாவைத் தேர்ந்தெடுக்கவும்</option>
-                {allPackages.map(pkg => (
-                  <option key={pkg.slug} value={pkg.title}>{pkg.title}</option>
+                <option value="">அனைத்து இடங்களும்</option>
+                {destinations.map((dest) => (
+                  <option key={dest.id} value={dest.slug}>
+                    {dest.name}
+                  </option>
                 ))}
               </select>
 
               {/* Duration Filter */}
-              <select 
+              <select
                 value={durationFilter}
                 onChange={(e) => setDurationFilter(e.target.value)}
-                className="px-4 py-2.5 rounded-xl bg-navy-50 border-none focus:ring-2 focus:ring-gold-400 font-tamil text-sm text-navy-600 outline-none w-full sm:w-48 appearance-none cursor-pointer"
+                aria-label="பயண நாட்கள்"
+                className="h-11 px-3.5 rounded-xl bg-[var(--h-ivory)] border border-[var(--s-line)] focus:border-[var(--h-gold)] focus:bg-white focus:outline-none text-sm text-[var(--h-navy)] cursor-pointer"
               >
                 <option value="all">அனைத்து நாட்கள்</option>
-                <option value="short">1 - 5 நாட்கள்</option>
-                <option value="medium">6 - 10 நாட்கள்</option>
-                <option value="long">11+ நாட்கள்</option>
+                <option value="short">குறுகிய பயணம் (1 – 5 நாட்கள்)</option>
+                <option value="medium">நடுத்தரப் பயணம் (6 – 10 நாட்கள்)</option>
+                <option value="long">நீண்ட பயணம் (11+ நாட்கள்)</option>
               </select>
 
+              {/* Sort Order */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortMode)}
+                aria-label="வரிசைப்படுத்து"
+                className="h-11 px-3.5 rounded-xl bg-[var(--h-ivory)] border border-[var(--s-line)] focus:border-[var(--h-gold)] focus:bg-white focus:outline-none text-sm text-[var(--h-navy)] cursor-pointer"
+              >
+                <option value="recommended">வரிசை: பரிந்துரைக்கப்பட்டவை</option>
+                <option value="durationAsc">நாட்கள்: குறைவு முதல் அதிகம்</option>
+                <option value="durationDesc">நாட்கள்: அதிகம் முதல் குறைவு</option>
+                <option value="priceAsc">விலை: குறைவு முதல் அதிகம்</option>
+              </select>
+            </div>
+
+            {/* Results summary & active filter pills */}
+            <div className="mt-3.5 pt-3.5 border-t border-[var(--s-line)] flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm">
+              <div className="flex flex-wrap items-center gap-2 text-[var(--h-muted)]">
+                <span className="inline-flex items-center gap-1.5 font-semibold text-[var(--h-navy)]">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#D99A0B]" aria-hidden="true" />
+                  {loading ? 'தொகுப்புகள் ஏற்றப்படுகின்றன...' : `${currentPackages.length} தொகுப்புகள் காணப்படுகின்றன`}
+                </span>
+                {activeDestination && (
+                  <button
+                    type="button"
+                    onClick={() => updateDestination('')}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--h-gold-soft)] border border-[var(--h-gold-border)] text-[var(--h-gold-text-2)] font-semibold hover:bg-[#ffeaa8]"
+                  >
+                    <MapPin className="w-3 h-3" aria-hidden="true" />
+                    {activeDestination.name}
+                    <X className="w-3 h-3 ml-0.5" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={resetAll}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-[var(--h-navy)] bg-[var(--h-grey)] hover:bg-[#e1e6f0] transition-colors"
+                >
+                  <RotateCcw className="w-3 h-3" aria-hidden="true" />
+                  அனைத்தையும் நீக்க
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Package Cards */}
-          <AnimatePresence mode="wait">
-            {currentPackages.length > 0 ? (
-              <motion.div
-                key="packages-grid"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5"
+          {/* Packages Grid */}
+          {loading ? (
+            <PackageGridSkeleton count={6} />
+          ) : error ? (
+            <div className="rounded-3xl bg-white border border-[var(--s-line)] p-10 text-center max-w-xl mx-auto">
+              <h3 className="text-xl font-bold text-[var(--h-navy)] mb-2">{error}</h3>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="mt-4 inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[var(--h-navy)] text-white text-sm font-bold hover:bg-[#1b2e55] transition-colors"
               >
-                {currentPackages.map((pkg, index) => (
-                  <motion.div
-                    key={pkg.slug}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(index * 0.04, 0.4) }}
-                    className="group rounded-2xl overflow-hidden bg-white shadow-md shadow-navy-950/5 border border-navy-100/40 hover:shadow-xl hover:shadow-navy-400/10 transition-all duration-300 hover:-translate-y-1 flex flex-col h-full"
-                  >
-                    {/* Image */}
-                    <div className="relative h-40 sm:h-36 md:h-40 overflow-hidden shrink-0">
-                      <HoverImageSlider images={pkg.images && pkg.images.length > 0 ? pkg.images : [pkg.image]} title={pkg.title} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent pointer-events-none" />
-                      <span className={`absolute top-2.5 left-2.5 px-2.5 py-0.5 ${pkg.tagColor} text-white text-[11px] font-bold rounded-full font-tamil shadow-sm`}>
-                        {pkg.categoryTag}
-                      </span>
-                      <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-navy-950/60 backdrop-blur-md text-white text-[11px] font-semibold rounded-full font-tamil">
-                          <Clock className="w-3 h-3 text-gold-400" />
-                          {pkg.duration}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-3.5 sm:p-4 flex flex-col flex-1">
-                      <h3 className="font-tamil text-sm sm:text-base font-bold text-navy-950 mb-1.5 leading-snug group-hover:text-gold-600 transition-colors line-clamp-2 min-h-[2.5rem]">
-                        {pkg.title}
-                      </h3>
-
-                      {pkg.placesToVisit && pkg.placesToVisit.length > 0 && (
-                        <div className="inline-flex items-center gap-1 text-[11px] text-navy-600 bg-navy-50/80 px-2 py-0.5 rounded-md mb-2 w-fit font-tamil font-medium">
-                          <MapPin className="w-3 h-3 text-gold-500 shrink-0" />
-                          <span>{pkg.placesToVisit.length} பார்க்கும் இடங்கள்</span>
-                        </div>
-                      )}
-
-                      <p className="font-tamil text-navy-600/70 text-xs leading-relaxed mb-3 line-clamp-2">
-                        {pkg.shortDescription}
-                      </p>
-
-                      {/* Inclusions */}
-                      <div className="flex flex-wrap items-center gap-1 mb-3 mt-auto">
-                        {pkg.inclusions.slice(0, 3).map((inc) => (
-                          <span
-                            key={inc}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 bg-navy-50/70 text-navy-700 text-[11px] font-medium rounded-md font-tamil"
-                          >
-                            <span className="w-1 h-1 rounded-full bg-gold-500" />
-                            {inc}
-                          </span>
-                        ))}
-                        {pkg.inclusions.length > 3 && (
-                          <span className="px-1 text-[10px] text-navy-400 font-tamil self-center">
-                            +{pkg.inclusions.length - 3}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* View Details Button */}
-                      <div className="pt-2.5 border-t border-navy-100/50">
-                        <Link
-                          to={`/package/${pkg.slug}`}
-                          className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-xs sm:text-sm rounded-xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-sm shadow-gold-500/20 hover:shadow-md hover:shadow-gold-500/30 hover:scale-[1.01] font-tamil"
-                        >
-                          விவரங்களை காண்க
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center justify-center py-20 text-center"
+                மீண்டும் முயற்சிக்கவும்
+              </button>
+            </div>
+          ) : currentPackages.length > 0 ? (
+            <div className="pk-grid">
+              {currentPackages.map((pkg, index) => (
+                <PackageCard key={pkg.id || pkg.slug} pkg={pkg} index={index} useSlider />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-3xl bg-white border border-[var(--s-line)] py-16 px-6 text-center max-w-lg mx-auto shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-[var(--h-ivory)] text-[var(--h-navy)] flex items-center justify-center mx-auto mb-5">
+                <Search className="w-7 h-7 opacity-60" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-bold text-[var(--h-navy)] mb-2">தொகுப்புகள் கிடைக்கவில்லை</h3>
+              <p className="text-sm text-[var(--h-muted)] leading-relaxed">
+                உங்கள் தேடலுக்கு ஏற்ற சுற்றுலா தொகுப்புகள் தற்போது இல்லை. வடிகட்டிகளை மாற்றி மீண்டும் முயற்சிக்கவும்.
+              </p>
+              <button
+                type="button"
+                onClick={resetAll}
+                className="mt-6 pk-btn !mt-6 inline-flex w-auto mx-auto"
               >
-                <div className="w-20 h-20 rounded-full bg-navy-50 flex items-center justify-center mb-6">
-                  <svg className="w-10 h-10 text-navy-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <h3 className="font-tamil text-xl font-bold text-navy-900 mb-2">தொகுப்புகள் கிடைக்கவில்லை</h3>
-                <p className="font-tamil text-navy-500 text-sm max-w-md">
-                  உங்கள் தேடலுக்கு ஏற்ற சுற்றுலா தொகுப்புகள் எதுவும் கிடைக்கவில்லை. தயவுசெய்து உங்கள் தேடலை மாற்றியமைத்து மீண்டும் முயற்சிக்கவும்.
+                <span>அனைத்து தொகுப்புகளையும் காண்க</span>
+                <span className="pk-btn-arrow" aria-hidden="true">
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* Custom Tour Enquiry Strip */}
+          {!loading && !error && (
+            <div className="mt-14 sm:mt-16 rounded-3xl bg-[var(--h-navy)] text-white p-6 sm:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="max-w-xl">
+                <span className="s-eyebrow s-eyebrow-navy">தனிப்பயன் சுற்றுலா திட்டம்</span>
+                <h2 className="mt-3 text-xl sm:text-2xl font-extrabold leading-snug">
+                  உங்கள் குடும்பம் அல்லது குழுவிற்கு பிரத்யேக பயணத் திட்டம் வேண்டுமா?
+                </h2>
+                <p className="mt-2 text-sm text-white/75 leading-relaxed">
+                  உங்கள் தேதி, நபர்களின் எண்ணிக்கை மற்றும் விருப்பத்திற்கேற்ப சிறந்த தொகுப்பை நாங்கள் வடிவமைத்துத் தருகிறோம்.
                 </p>
-                <button 
-                  onClick={() => { setSearchQuery(''); setDurationFilter('all'); }}
-                  className="mt-6 font-tamil px-6 py-2 bg-navy-50 hover:bg-navy-100 text-navy-700 font-semibold rounded-lg transition-colors"
+              </div>
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <a
+                  href={`tel:${(homepage.cta?.phone || '+919944171722').replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-2.5 px-5 py-3 rounded-full bg-[var(--h-gold)] text-[var(--h-navy)] font-bold text-sm hover:bg-[#f5c44c] transition-colors"
                 >
-                  வடிகட்டிகளை அழிக்க
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <Phone className="w-4 h-4" aria-hidden="true" />
+                  இப்போது அழைக்கவும்
+                </a>
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-white/10 border border-white/20 text-white font-semibold text-sm hover:bg-white/20 transition-colors"
+                >
+                  <span>தொடர்பு கொள்ள</span>
+                  <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </>

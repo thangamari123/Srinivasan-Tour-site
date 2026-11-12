@@ -20,3 +20,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Environment variables (never commit real values)
+.env
+.env.local
+.env.*.local
+
+# Cloudflare Wrangler
+.wrangler/
+worker/.dev.vars

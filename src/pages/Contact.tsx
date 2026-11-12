@@ -78,7 +78,7 @@ export default function Contact() {
       <section className="relative pt-32 pb-20 bg-navy-950 overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="/images/gallery5.webp"
+            src="https://srinivasa-media-api.srinivasatour23.workers.dev/api/images/website/gallery/gallery5.webp"
             alt="Contact"
             className="w-full h-full object-cover opacity-20"
           />
@@ -93,7 +93,7 @@ export default function Contact() {
             <span className="inline-block px-4 py-1.5 bg-gold-400/10 text-gold-400 text-sm font-semibold rounded-full font-tamil mb-4">
               தொடர்பு
             </span>
-            <h1 className="font-tamil text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h1 className="font-tamil text-[1.75rem] leading-tight min-[375px]:text-3xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 text-balance [overflow-wrap:anywhere]">
               எங்களை தொடர்பு கொள்ளுங்கள்
             </h1>
             <p className="font-tamil text-white/60 text-lg max-w-2xl mx-auto">
@@ -107,7 +107,7 @@ export default function Contact() {
       <section className="py-20 bg-white relative">
         <div className="absolute inset-0 pattern-dots opacity-30" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 sm:mb-20">
             {contactInfo.map((info, index) => (
               <motion.div
                 key={info.title}
@@ -115,7 +115,7 @@ export default function Contact() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="text-center p-6 rounded-3xl bg-white shadow-lg shadow-navy-950/5 border border-navy-100/30 hover:shadow-xl hover:shadow-navy-400/10 transition-all duration-300"
+                className="text-center p-5 sm:p-6 rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-line)] hover:shadow-[var(--shadow-card-hover)] transition-all duration-300"
               >
                 <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${info.color} text-white mb-4`}>
                   <info.icon className="w-6 h-6" />
@@ -134,7 +134,7 @@ export default function Contact() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="p-8 sm:p-10 rounded-3xl bg-white shadow-2xl shadow-navy-950/5 border border-navy-100/30"
+              className="p-5 min-[375px]:p-6 sm:p-10 rounded-3xl bg-white shadow-[var(--shadow-card)] border border-[var(--color-line)]"
             >
               <div className="text-center mb-8">
                 <h2 className="font-tamil text-2xl sm:text-3xl font-bold text-navy-950 mb-2">
@@ -234,9 +234,9 @@ export default function Contact() {
 
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-base rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 sm:px-8 py-3.5 sm:py-4 bg-gradient-to-r from-gold-400 to-gold-500 text-navy-950 font-bold text-[15px] sm:text-base leading-snug rounded-2xl hover:from-gold-300 hover:to-gold-400 transition-all duration-300 shadow-lg shadow-gold-500/25 hover:shadow-gold-500/40 hover:scale-[1.02] font-tamil"
                   >
-                    <Send className="w-5 h-5" />
+                    <Send className="w-5 h-5 shrink-0" />
                     விசாரனை அனுப்புங்கள்
                   </button>
                 </form>

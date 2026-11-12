@@ -1,0 +1,19 @@
+name = "srinivasa-media-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# R2 bucket binding — the Worker talks to R2 directly, so no access keys are needed anywhere.
+# Bucket: srinivasa-tour-media (public access disabled → images are served by this Worker)
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "srinivasa-tour-media"
+
+[vars]
+# Your Firebase project id (public value, not a secret).
+FIREBASE_PROJECT_ID = "srinivasan-tour"
+# Browser origins allowed to call the upload/delete API (comma separated, no trailing slash).
+ALLOWED_ORIGINS = "https://srinivasatour.com,https://www.srinivasatour.com,http://localhost:5173"
+# Optional: public URL of the bucket (custom domain or r2.dev). Empty = images are served
+# through this Worker at /api/images/<key> (required while the bucket's Public Access is Disabled).
+PUBLIC_BASE_URL = ""
+MAX_UPLOAD_BYTES = "10485760"
